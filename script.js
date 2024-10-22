@@ -1187,7 +1187,7 @@ class PrintPreviewModule {
         });
 
         const printWindow = window.open('', 'PrintWindow', 'width=800,height=600');
-        printWindow.document.write('<html><head><title>Impression du Canevas</title>');
+        printWindow.document.write('<html><head><title></title>');
         printWindow.document.write(`
             <style>
                 @media print {
