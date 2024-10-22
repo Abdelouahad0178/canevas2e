@@ -24,7 +24,7 @@ body {
     width: 100%;
     gap: 10px;
     padding: 10px;
-    max-width: 1440px;
+    width: 1440px;
     flex-direction: column;
     filter: drop-shadow(0 50px 20px rgba(0, 0, 0, 0.1));
 }
@@ -228,6 +228,8 @@ section {
 .drawing-board canvas {
     width: 100%;
     height: auto; /* Permet au canevas de définir sa propre hauteur via JS */
+    
+    
 }
 
 /* Bouton de duplication flottant */
@@ -296,7 +298,7 @@ section {
     z-index: 9999; /* Assurez-vous que la calculatrice est au-dessus de tout */
     left: 50%;
     top: 20%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -0%);
     background: #fff;
     padding: 20px;
     border-radius: 10px;

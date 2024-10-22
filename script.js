@@ -36,6 +36,7 @@ class HistoryModule {
 }
 
 // Module de Gestion des Couleurs
+// Module de Gestion des Couleurs
 class ColorModule {
     constructor() {
         this.selectedColorBtn = null;
@@ -49,29 +50,26 @@ class ColorModule {
     }
 
     setupCustomColorPicker() {
-        const customColorPicker = document.getElementById('color-picker');
-        if (customColorPicker) {
-            customColorPicker.addEventListener('change', (e) => {
-                if (this.selectedColorBtn) {
-                    this.selectedColorBtn.classList.remove("selected");
-                }
-                customColorPicker.parentElement.style.backgroundColor = e.target.value;
-                customColorPicker.parentElement.classList.add("selected");
-                this.selectedColorBtn = customColorPicker.parentElement;
+        const unifiedColorPicker = document.getElementById('unified-color-picker');
+        console.log(unifiedColorPicker); // Vérifiez la valeur de l'élément
+
+        if (unifiedColorPicker) {
+            unifiedColorPicker.addEventListener('change', (e) => {
+                this.selectedShapeColor = e.target.value;
             });
         } else {
-            console.warn("Le sélecteur de couleur personnalisé avec l'ID 'color-picker' est introuvable.");
+            console.warn("Le sélecteur de couleur unique est introuvable.");
         }
     }
 
     setupShapeColorPicker() {
-        const shapeColorPicker = document.getElementById('shape-color-picker');
-        if (shapeColorPicker) {
-            shapeColorPicker.addEventListener('change', (e) => {
-                this.selectedShapeColor = e.target.value;
+        const unifiedColorPicker = document.getElementById('unified-color-picker');
+        if (unifiedColorPicker) {
+            unifiedColorPicker.addEventListener('change', (e) => {
+                this.selectedShapeColor = e.target.value; // Met à jour la couleur de forme
             });
         } else {
-            console.warn("Le sélecteur de couleur des formes avec l'ID 'shape-color-picker' est introuvable.");
+            console.warn("Le sélecteur de couleur des formes avec l'ID 'unified-color-picker' est introuvable.");
         }
     }
 
@@ -89,12 +87,12 @@ class ColorModule {
     }
 
     getBrushColor() {
-        if (this.selectedColorBtn && this.selectedColorBtn.id !== 'color-picker') {
-            return window.getComputedStyle(this.selectedColorBtn).getPropertyValue("background-color");
-        } else {
-            const customColorPicker = document.getElementById('color-picker');
-            return customColorPicker.value || "#000000";
+        const unifiedColorPicker = document.getElementById('unified-color-picker');
+        if (unifiedColorPicker) {
+            return unifiedColorPicker.value || "#000000"; // Couleur par défaut
         }
+        console.error("Sélecteur de couleur unique introuvable.");
+        return "#000000"; // Valeur par défaut si le sélecteur est manquant
     }
 
     getShapeColor() {
@@ -102,7 +100,8 @@ class ColorModule {
     }
 }
 
-// Module de Gestion du Pinceau et de la Gomme
+
+// Module de Gestion du Pinceau et de la Gomme// Module de Gestion du Pinceau et de la Gomme
 class BrushModule {
     constructor(canvas, colorModule, historyModule) {
         this.canvas = canvas;
@@ -144,34 +143,61 @@ class BrushModule {
             console.warn("Le bouton 'Gomme' avec l'ID 'eraser' est introuvable.");
         }
     }
-
     setupSizeSlider() {
-        if (this.sizeSlider) {
-            this.sizeSlider.addEventListener('change', (e) => {
+        const unifiedSizeSlider = document.querySelector("#unified-size-slider");
+        if (unifiedSizeSlider) {
+            unifiedSizeSlider.addEventListener('change', (e) => {
                 const size = parseInt(e.target.value, 10);
                 if (this.canvas.isDrawingMode) {
                     this.canvas.freeDrawingBrush.width = size;
                 }
             });
         } else {
-            console.warn("Le curseur de taille avec l'ID 'size-slider' est introuvable.");
+            console.warn("Le curseur de taille unique est introuvable.");
         }
     }
-
+    
+    
+    
     setupMouseUp() {
         this.canvas.on('mouse:up', () => {
             this.canvas.isDrawingMode = false;
             this.canvas.selection = true;
-            this.canvas.freeDrawingBrush.color = this.colorModule.getBrushColor();
-            this.canvas.freeDrawingBrush.width = parseInt(this.sizeSlider.value, 10);
+    
+            const unifiedColorPicker = document.getElementById('unified-color-picker');
+            if (unifiedColorPicker) {
+                const brushColor = unifiedColorPicker.value || "#000000"; // Couleur par défaut
+                this.canvas.freeDrawingBrush.color = brushColor; // Appliquer la couleur de pinceau
+            } else {
+                console.error("Le sélecteur de couleur unique 'unified-color-picker' est introuvable.");
+                this.canvas.freeDrawingBrush.color = "#000000"; // Utiliser une couleur par défaut si l'élément est introuvable
+            }
+            
+    
+            // Vérifiez que sizeSlider est également accessible
+            if (this.sizeSlider) {
+                this.canvas.freeDrawingBrush.width = parseInt(this.sizeSlider.value, 10);
+            } else {
+                console.error("Le sélecteur de taille 'sizeSlider' est introuvable.");
+            }
+    
             this.history.enregistrerEtat(); // Enregistrer l'état après dessin
         });
     }
+    
+    
+    
+    
 }
+
+
+//console.log(unifiedColorPicker); // Pour vérifier si l'élément existe
+
 
 class PageModule {
     constructor(canvas, historyModule) {
         this.canvas = canvas;
+        this.backgroundColor = '#ffffff'; // Couleur de fond par défaut
         this.history = historyModule;
         this.pages = [];
         this.currentPageIndex = 0;
@@ -187,6 +213,7 @@ class PageModule {
         this.addPageBtn.addEventListener('click', () => this.addPage());
         this.prevPageBtn.addEventListener('click', () => this.prevPage());
         this.nextPageBtn.addEventListener('click', () => this.nextPage());
+
     }
 
     addPage() {
@@ -214,23 +241,43 @@ class PageModule {
         });
     }
 
-    switchToPage(index) {
-        if (index < 0 || index >= this.pages.length) {
-            alert("Page inexistante.");
-            return;
-        }
-        this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
-        const newPage = this.pages[index];
-        this.canvas.clear();
-        if (newPage.canvasState) {
-            this.canvas.loadFromJSON(newPage.canvasState, () => this.canvas.renderAll());
-        } else {
-            this.setupA4Canvas();
-        }
-        this.currentPageIndex = index;
-        this.renderPageList();
-        this.history.enregistrerEtat();
+   switchToPage(index) {
+    // Vérifiez si l'index est valide
+    if (index < 0 || index >= this.pages.length) {
+        alert("Page inexistante.");
+        return;
     }
+    
+    // Enregistrer l'état de la page actuelle avant de changer
+    this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
+    
+    // Charger l'état de la nouvelle page
+    const newPage = this.pages[index];
+    
+    // Effacer le canevas actuel
+    this.canvas.clear();
+    
+    // Charger l'état de la nouvelle page si disponible
+    if (newPage.canvasState) {
+        this.canvas.loadFromJSON(newPage.canvasState, () => {
+            // Appliquer la couleur de fond à chaque changement de page
+            this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
+        });
+    } else {
+        // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
+        this.setupA4Canvas();
+    }
+    
+    // Mettre à jour l'index de la page actuelle
+    this.currentPageIndex = index;
+    
+    // Rendre la liste des pages
+    this.renderPageList();
+    
+    // Enregistrer l'état de la page actuelle après le changement
+    this.history.enregistrerEtat();
+}
+
 
     saveAllPagesAsJSON() {
         this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
@@ -269,14 +316,15 @@ class PageModule {
             alert("Vous êtes déjà sur la dernière page.");
         }
     }
-
     setupA4Canvas() {
-        const width = 210 * 3.779527;
-        const height = 297 * 3.779527;
+        const width = 280 * 3.779527; // largeur A4 en pixels
+        const height = 297 * 3.779527; // hauteur A4 en pixels
         this.canvas.setWidth(width);
         this.canvas.setHeight(height);
+        this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
         this.canvas.renderAll();
     }
+    
 }
 
 // Module de Gestion des Formes et Mesures
@@ -824,8 +872,8 @@ class CalculatorModule {
             if (isDragging) {
                 const pointer = getPointerPosition(e);
                 // Calculer les nouvelles positions en tenant compte des limites de la fenêtre
-                let newLeft = pointer.x - offsetX;
-                let newTop = pointer.y - offsetY;
+                let newLeft = pointer.x - offsetX-90;
+                let newTop = pointer.y - offsetY-80;
 
                 // Empêcher la calculatrice de sortir de l'écran
                 const windowWidth = window.innerWidth;
