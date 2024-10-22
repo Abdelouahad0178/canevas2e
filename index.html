@@ -19,11 +19,11 @@
             
             <!-- Gestion des Pages -->
             <div class="row">
-                <h3>Pages</h3>
+                <h3></h3>
                 <div class="page-controls">
                     <button id="add-page-btn">➕  Page</button>
-                    <button id="prev-page-btn">◀️ </button>
-                    <button id="next-page-btn"> ▶️</button>
+                    <button id="prev-page-btn" style="display: none;">◀️ </button>
+                    <button id="next-page-btn" style="display: none;"> ▶️</button>
                 </div>
                 <div id="page-list" class="page-list">
                     <!-- Les boutons de pages seront ajoutés dynamiquement ici -->
@@ -34,16 +34,16 @@
             <div class="row">
                 <ul class="options">
                     <li class="option tool" id="rectangle">
-                        <span style="cursor: pointer;"> 🔲</span>
+                        <span style="cursor: pointer;" class="spane"> 🔲</span>
                     </li>
                     <li class="option tool" id="circle">
-                        <span> ⚪</span>
+                        <span class="spane"> ⚪</span>
                     </li>
                     <li class="option tool" id="triangle">
-                        <span>🔺</span>
+                        <span class="spane">🔺</span>
                     </li>
                     <li class="option tool" id="rectangle-fixed-height">
-                        <span>📏</span>
+                        <span class="spane">📏</span>
                     </li>
                 </ul>
                 <div class="fill-options">
@@ -61,7 +61,7 @@
         
            <!-- Sélecteur de couleur unique -->
 <div class="row">
-    <h3>Couleur</h3>
+    <h3></h3>
     
     <input type="color" id="unified-color-picker" value="#000000">
 
@@ -70,7 +70,7 @@
 
            <!-- Curseur de taille unique -->
 <div class="row">
-    <h3>Taille</h3>
+    <h3></h3>
     <input type="range" id="unified-size-slider" min="1" max="100" value="10">
     
     
