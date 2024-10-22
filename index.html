@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Dessin Multi-Page</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Bibliothèques externes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <!-- Importation de Hammer.js pour les gestes tactiles -->
+    <script defer src="script.js"></script>
+    <!-- Votre script principal -->
+</head>
+<body>
+    <div class="container">
+        <section class="tools-board">
+            <h2 class="title">Outils</h2>
+            
+            <!-- Gestion des Pages -->
+            <div class="row">
+                <h3>Pages</h3>
+                <div class="page-controls">
+                    <button id="add-page-btn">➕ Ajouter Page</button>
+                    <button id="prev-page-btn">◀️ Précédente</button>
+                    <button id="next-page-btn">Suivante ▶️</button>
+                </div>
+                <div id="page-list" class="page-list">
+                    <!-- Les boutons de pages seront ajoutés dynamiquement ici -->
+                </div>
+            </div>
+
+            <!-- Outils de dessin -->
+            <div class="row">
+                <ul class="options">
+                    <li class="option tool" id="rectangle">
+                        <span style="cursor: pointer;"> 🔲</span>
+                    </li>
+                    <li class="option tool" id="circle">
+                        <span> ⚪</span>
+                    </li>
+                    <li class="option tool" id="triangle">
+                        <span>🔺</span>
+                    </li>
+                    <li class="option tool" id="rectangle-fixed-height">
+                        <span>📏</span>
+                    </li>
+                </ul>
+                <div class="fill-options">
+                    <label>
+                        <input type="radio" name="shape-fill" value="filled" checked>
+                        <span>Rempli</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="shape-fill" value="hollow">
+                        <span>Vide</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Sélecteur de couleur -->
+            <div class="row">
+                <h3>Couleurs</h3>
+                <ul class="colors options">
+                    <li class="option" style="background-color: #000000;"></li>
+                    <li class="option" style="background-color: #FF0000;"></li>
+                    <li class="option" style="background-color: #00FF00;"></li>
+                    <li class="option" style="background-color: #0000FF;"></li>
+                    <li class="option" style="background-color: #FFFF00;"></li>
+                    <li class="option" style="background-color: #FFA500;"></li>
+                    <li class="option" style="background-color: #800080;"></li>
+                    <li class="option">
+                        <input type="color" id="color-picker">
+                    </li>
+                </ul>
+                <input type="color" id="shape-color-picker" title="Couleur des formes">
+            </div>
+
+            <!-- Curseur de taille -->
+            <div class="row">
+                <h3>Taille</h3>
+                <input type="range" id="size-slider" min="1" max="100" value="10">
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="row buttons">
+                <button id="brush">🖌️ Pinceau</button>
+                <button id="eraser">🧽 Gomme</button>
+                <button class="clear-canvas">🗑️ Canevas</button>
+                <button class="save-img">💾 Image</button>
+                <!-- Bouton pour ajouter du texte -->
+                <button id="add-text-btn">Ajouter Texte</button>
+            </div>
+
+            <!-- Bouton pour charger une image -->
+            <div class="row buttons">
+                <input type="file" id="upload-image" accept="image/*">
+            </div>
+
+            <div class="row buttons">
+                <button id="save-json">💾 JSON</button>
+                <input type="file" id="load-json" accept=".json" style="display: none;">
+                <label for="load-json" class="load-json-btn">📁 JSON</label>
+            </div>
+
+            <div class="row buttons">
+                <button id="delete-object">🗑️ Objet</button>
+            </div>
+
+            <div class="row buttons">
+                <button id="delete-measurement-text">🗑️ Texte </button>
+            </div>
+
+            <div class="row buttons">
+                <button id="show-calculator"> 🧮 Calculatrice</button>
+            </div>
+
+            <!-- Bouton pour insérer un tableau -->
+            <button id="add-table-btn">🧮 Tableau</button>
+
+            <div class="row buttons">
+                <button id="annuler-btn">↩️ Annuler</button>
+                <button id="rétablir-btn">↪️ Rétablir</button>
+            </div>
+
+            <!-- Bouton pour réinitialiser la vue -->
+            <div class="row buttons">
+                <button id="reset-view-btn">Réinitialiser Vue</button>
+            </div>
+
+            <!-- Bouton pour Aperçu Avant Impression -->
+            <div class="row buttons">
+                <button id="print-preview-btn">🖨️ Impression</button>
+            </div>
+
+            <!-- Palette de Photos -->
+            <div class="row buttons">
+                <button id="open-photo-palette-btn">📁 Photos</button>
+            </div>
+
+            <!-- Fenêtre Palette de Photos -->
+            <div id="photo-palette-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h2>Palette de Photos</h2>
+                    <input type="text" id="photo-search" placeholder="Rechercher des photos..." />
+                    <div id="photo-gallery" class="photo-gallery">
+                        <!-- Les photos seront chargées ici dynamiquement -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="drawing-board">
+            <canvas id="canvas"></canvas>
+        </section>
+    </div>
+
+    <!-- Fenêtre calculatrice -->
+    <div id="calculator-canvas" class="calculator" style="display: none;">
+        <h3 style="color: blue;">Calculatrice</h3>
+        <input type="text" id="canvas-calc-display" disabled>
+        <div class="calculator-buttons">
+            <button class="calc-btn">7</button>
+            <button class="calc-btn">8</button>
+            <button class="calc-btn">9</button>
+            <button class="calc-btn">/</button>
+            <button class="calc-btn">4</button>
+            <button class="calc-btn">5</button>
+            <button class="calc-btn">6</button>
+            <button class="calc-btn">*</button>
+            <button class="calc-btn">1</button>
+            <button class="calc-btn">2</button>
+            <button class="calc-btn">3</button>
+            <button class="calc-btn">-</button>
+            <button class="calc-btn">0</button>
+            <button class="calc-btn">.</button>
+            <button class="calc-btn">=</button>
+            <button class="calc-btn">+</button>
+            <button class="calc-btn" id="canvas-calc-clear">C</button>
+        </div>
+        <button id="close-canvas-calculator">Fermer</button>
+    </div>
+
+    <!-- Menu des propriétés de texte -->
+    <div id="text-properties-menu" class="text-properties" style="display:none;">
+        <label for="font-family">Police :</label>
+        <select id="font-family">
+            <option value="Arial">Arial</option>
+            <option value="Poppins">Poppins</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Times New Roman">Times New Roman</option>
+        </select>
+
+        <label for="font-size">Taille :</label>
+        <input type="number" id="font-size" min="8" max="100" value="20">
+
+        <label for="font-weight">Poids :</label>
+        <select id="font-weight">
+            <option value="normal">Normal</option>
+            <option value="bold">Gras</option>
+        </select>
+
+        <label for="text-color">Couleur :</label>
+        <input type="color" id="text-color" value="#000000">
+    </div>
+
+    <!-- Fenêtre d'aperçu avant impression -->
+    <div id="print-preview-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Aperçu Avant Impression</h2>
+            <img id="preview-image" src="" alt="Aperçu du Canevas" style="width: 100%; height: auto;">
+            <button id="print-btn">Imprimer</button>
+        </div>
+    </div>
+</body>
+</html>
