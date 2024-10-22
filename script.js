@@ -317,8 +317,8 @@ class PageModule {
         }
     }
     setupA4Canvas() {
-        const width = 230 * 3.779527; // largeur A4 en pixels
-        const height = 297 * 3.779527; // hauteur A4 en pixels
+        const width = 280 * 3.779527; // largeur A4 en pixels
+        const height = 410 * 3.779527; // hauteur A4 en pixels
         this.canvas.setWidth(width);
         this.canvas.setHeight(height);
         this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
