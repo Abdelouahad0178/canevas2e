@@ -21,6 +21,8 @@ class HistoryModule {
             this.canvas.loadFromJSON(this.history[this.currentIndex], () => {
                 this.canvas.renderAll();
             });
+        } else {
+            alert("Aucun état précédent disponible.");
         }
     }
 
@@ -31,11 +33,12 @@ class HistoryModule {
             this.canvas.loadFromJSON(this.history[this.currentIndex], () => {
                 this.canvas.renderAll();
             });
+        } else {
+            alert("Aucun état suivant disponible.");
         }
     }
 }
 
-// Module de Gestion des Couleurs
 // Module de Gestion des Couleurs
 class ColorModule {
     constructor() {
@@ -51,7 +54,6 @@ class ColorModule {
 
     setupCustomColorPicker() {
         const unifiedColorPicker = document.getElementById('unified-color-picker');
-        console.log(unifiedColorPicker); // Vérifiez la valeur de l'élément
 
         if (unifiedColorPicker) {
             unifiedColorPicker.addEventListener('change', (e) => {
@@ -100,14 +102,13 @@ class ColorModule {
     }
 }
 
-
-// Module de Gestion du Pinceau et de la Gomme// Module de Gestion du Pinceau et de la Gomme
+// Module de Gestion du Pinceau et de la Gomme
 class BrushModule {
     constructor(canvas, colorModule, historyModule) {
         this.canvas = canvas;
         this.colorModule = colorModule;
         this.history = historyModule;
-        this.sizeSlider = document.querySelector("#size-slider");
+        this.sizeSlider = document.querySelector("#unified-size-slider");
     }
 
     init() {
@@ -143,6 +144,7 @@ class BrushModule {
             console.warn("Le bouton 'Gomme' avec l'ID 'eraser' est introuvable.");
         }
     }
+
     setupSizeSlider() {
         const unifiedSizeSlider = document.querySelector("#unified-size-slider");
         if (unifiedSizeSlider) {
@@ -156,44 +158,36 @@ class BrushModule {
             console.warn("Le curseur de taille unique est introuvable.");
         }
     }
-    
-    
-    
+
     setupMouseUp() {
         this.canvas.on('mouse:up', () => {
-            this.canvas.isDrawingMode = false;
-            this.canvas.selection = true;
-    
-            const unifiedColorPicker = document.getElementById('unified-color-picker');
-            if (unifiedColorPicker) {
-                const brushColor = unifiedColorPicker.value || "#000000"; // Couleur par défaut
-                this.canvas.freeDrawingBrush.color = brushColor; // Appliquer la couleur de pinceau
-            } else {
-                console.error("Le sélecteur de couleur unique 'unified-color-picker' est introuvable.");
-                this.canvas.freeDrawingBrush.color = "#000000"; // Utiliser une couleur par défaut si l'élément est introuvable
+            if (this.canvas.isDrawingMode) {
+                this.canvas.isDrawingMode = false;
+                this.canvas.selection = true;
+
+                const unifiedColorPicker = document.getElementById('unified-color-picker');
+                if (unifiedColorPicker) {
+                    const brushColor = unifiedColorPicker.value || "#000000"; // Couleur par défaut
+                    this.canvas.freeDrawingBrush.color = brushColor; // Appliquer la couleur de pinceau
+                } else {
+                    console.error("Le sélecteur de couleur unique 'unified-color-picker' est introuvable.");
+                    this.canvas.freeDrawingBrush.color = "#000000"; // Utiliser une couleur par défaut si l'élément est introuvable
+                }
+
+                // Vérifiez que sizeSlider est également accessible
+                if (this.sizeSlider) {
+                    this.canvas.freeDrawingBrush.width = parseInt(this.sizeSlider.value, 10);
+                } else {
+                    console.error("Le sélecteur de taille 'sizeSlider' est introuvable.");
+                }
+
+                this.history.enregistrerEtat(); // Enregistrer l'état après dessin
             }
-            
-    
-            // Vérifiez que sizeSlider est également accessible
-            if (this.sizeSlider) {
-                this.canvas.freeDrawingBrush.width = parseInt(this.sizeSlider.value, 10);
-            } else {
-                console.error("Le sélecteur de taille 'sizeSlider' est introuvable.");
-            }
-    
-            this.history.enregistrerEtat(); // Enregistrer l'état après dessin
         });
     }
-    
-    
-    
-    
 }
 
-
-//console.log(unifiedColorPicker); // Pour vérifier si l'élément existe
-
-
+// Classe PageModule avec la méthode deleteCurrentPage corrigée et renommage des pages
 class PageModule {
     constructor(canvas, historyModule) {
         this.canvas = canvas;
@@ -213,7 +207,6 @@ class PageModule {
         this.addPageBtn.addEventListener('click', () => this.addPage());
         this.prevPageBtn.addEventListener('click', () => this.prevPage());
         this.nextPageBtn.addEventListener('click', () => this.nextPage());
-
     }
 
     addPage() {
@@ -236,48 +229,120 @@ class PageModule {
             if (index === this.currentPageIndex) {
                 pageBtn.classList.add('active');
             }
+
+            // Événement de clic pour changer de page
             pageBtn.addEventListener('click', () => this.switchToPage(index));
+
+            // Événement de double-clic pour renommer la page
+            pageBtn.addEventListener('dblclick', (e) => {
+                e.stopPropagation(); // Empêche le déclenchement de l'événement de clic
+                this.renamePage(index);
+            });
+
             this.pageListElement.appendChild(pageBtn);
         });
     }
 
-   switchToPage(index) {
-    // Vérifiez si l'index est valide
-    if (index < 0 || index >= this.pages.length) {
-        alert("Page inexistante.");
-        return;
-    }
-    
-    // Enregistrer l'état de la page actuelle avant de changer
-    this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
-    
-    // Charger l'état de la nouvelle page
-    const newPage = this.pages[index];
-    
-    // Effacer le canevas actuel
-    this.canvas.clear();
-    
-    // Charger l'état de la nouvelle page si disponible
-    if (newPage.canvasState) {
-        this.canvas.loadFromJSON(newPage.canvasState, () => {
-            // Appliquer la couleur de fond à chaque changement de page
-            this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
-        });
-    } else {
-        // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
-        this.setupA4Canvas();
-    }
-    
-    // Mettre à jour l'index de la page actuelle
-    this.currentPageIndex = index;
-    
-    // Rendre la liste des pages
-    this.renderPageList();
-    
-    // Enregistrer l'état de la page actuelle après le changement
-    this.history.enregistrerEtat();
-}
+    switchToPage(index) {
+        // Vérifiez si l'index est valide
+        if (index < 0 || index >= this.pages.length) {
+            alert("Page inexistante.");
+            return;
+        }
+        
+        // Enregistrer l'état de la page actuelle avant de changer
+        this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
 
+        // Charger l'état de la nouvelle page
+        const newPage = this.pages[index];
+        
+        // Effacer le canevas actuel
+        this.canvas.clear();
+        
+        // Charger l'état de la nouvelle page si disponible
+        if (newPage.canvasState) {
+            this.canvas.loadFromJSON(newPage.canvasState, () => {
+                // Appliquer la couleur de fond à chaque changement de page
+                this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
+                this.canvas.renderAll();
+            });
+        } else {
+            // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
+            this.setupA4Canvas();
+        }
+        
+        // Mettre à jour l'index de la page actuelle
+        this.currentPageIndex = index;
+        
+        // Rendre la liste des pages
+        this.renderPageList();
+        
+        // Enregistrer l'état de la page actuelle après le changement
+        this.history.enregistrerEtat();
+    }
+
+    // Méthode pour renommer une page
+    renamePage(index) {
+        const currentName = this.pages[index].name;
+        const newName = prompt("Entrez le nouveau nom de la page :", currentName);
+        if (newName && newName.trim() !== "") {
+            // Vérifier si le nom est déjà utilisé
+            const nameExists = this.pages.some((page, idx) => page.name === newName && idx !== index);
+            if (nameExists) {
+                alert("Ce nom de page est déjà utilisé. Veuillez choisir un autre nom.");
+                return;
+            }
+            this.pages[index].name = newName.trim();
+            this.renderPageList();
+            this.history.enregistrerEtat();
+        } else {
+            alert("Le nom de la page ne peut pas être vide.");
+        }
+    }
+
+    // Méthode corrigée pour supprimer la page actuelle
+    deleteCurrentPage() {
+        if (this.pages.length <= 1) {
+            alert("Il doit y avoir au moins une page.");
+            return;
+        }
+
+        if (!confirm(`Voulez-vous vraiment supprimer ${this.pages[this.currentPageIndex].name} ?`)) {
+            return;
+        }
+
+        // Supprimer la page de l'array des pages
+        this.pages.splice(this.currentPageIndex, 1);
+
+        // Renuméroter les pages restantes pour assurer l'unicité et la séquence
+        this.pages.forEach((page, index) => {
+            page.id = index + 1;
+            // Si le nom suit le format "Page X", mettre à jour le numéro
+            if (/^Page \d+$/.test(page.name)) {
+                page.name = `Page ${index + 1}`;
+            }
+        });
+
+        // Passer à la nouvelle page actuelle sans charger une autre page automatiquement
+        if (this.pages.length === 0) {
+            // Si aucune page ne reste, en ajouter une nouvelle
+            this.addPage();
+        } else {
+            // Si la page supprimée était la dernière, passer à la nouvelle dernière page
+            if (this.currentPageIndex >= this.pages.length) {
+                this.currentPageIndex = this.pages.length - 1;
+            }
+            this.switchToPage(this.currentPageIndex);
+        }
+
+        // Rendre la liste des pages
+        this.renderPageList();
+
+        // Enregistrer l'état après suppression
+        this.history.enregistrerEtat();
+
+        alert("Page supprimée avec succès.");
+    }
 
     saveAllPagesAsJSON() {
         this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
@@ -298,7 +363,17 @@ class PageModule {
     loadFromJSON(json) {
         const pagesData = JSON.parse(json);
         this.pages = pagesData;
-        this.switchToPage(0); // Charger la première page
+        // Renuméroter les pages pour s'assurer qu'elles sont séquentielles
+        this.pages.forEach((page, index) => {
+            page.id = index + 1;
+            // Si le nom ne suit pas le format "Page X", le laisser tel quel
+            // Sinon, mettre à jour le numéro pour garantir la séquence
+            if (/^Page \d+$/.test(page.name)) {
+                page.name = `Page ${index + 1}`;
+            }
+        });
+        this.currentPageIndex = 0; // Réinitialiser l'index
+        this.switchToPage(this.currentPageIndex); // Charger la première page
     }
 
     prevPage() {
@@ -316,6 +391,7 @@ class PageModule {
             alert("Vous êtes déjà sur la dernière page.");
         }
     }
+
     setupA4Canvas() {
         const width = 280 * 3.779527; // largeur A4 en pixels
         const height = 410 * 3.779527; // hauteur A4 en pixels
@@ -324,7 +400,6 @@ class PageModule {
         this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
         this.canvas.renderAll();
     }
-    
 }
 
 // Module de Gestion des Formes et Mesures
@@ -465,9 +540,10 @@ class ShapesModule {
 
         const pointer = this.canvas.getPointer(opt.e);
         const width = pointer.x - this.startX;
+        const height = pointer.y - this.startY;
 
         if (this.drawingMode === 'rectangle') {
-            this.tempShape.set({ width: width, height: pointer.y - this.startY });
+            this.tempShape.set({ width: width, height: height });
             this.canvas.renderAll();
             this.updateShapeMeasurements(this.tempShape, this.tempShape.measurementText);
         } else if (this.drawingMode === 'rectangle-fixed-height') {
@@ -830,7 +906,6 @@ class TextModule {
         });
     }
 }
-
 // Module de Gestion de la Calculatrice Intégrée
 class CalculatorModule {
     constructor() {
@@ -872,8 +947,8 @@ class CalculatorModule {
             if (isDragging) {
                 const pointer = getPointerPosition(e);
                 // Calculer les nouvelles positions en tenant compte des limites de la fenêtre
-                let newLeft = pointer.x - offsetX-90;
-                let newTop = pointer.y - offsetY-80;
+                let newLeft = pointer.x - offsetX - 90; // Ajustez ces valeurs si nécessaire
+                let newTop = pointer.y - offsetY - 80;
 
                 // Empêcher la calculatrice de sortir de l'écran
                 const windowWidth = window.innerWidth;
@@ -982,7 +1057,6 @@ class ImportExportModule {
         this.setupUploadImage();
         this.setupSaveJSON();
         this.setupLoadJSON();
-        this.setupDeleteObject();
         this.setupDeleteMeasurementText();
         this.setupClearCanvas();
     }
@@ -1087,15 +1161,7 @@ class ImportExportModule {
         reader.readAsText(file);
     }
 
-    setupDeleteObject() {
-        const deleteObjectBtn = document.getElementById('delete-object');
-        if (deleteObjectBtn) {
-            deleteObjectBtn.addEventListener("click", () => this.deleteSelectedObject());
-        } else {
-            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
-        }
-    }
-
+    // Méthode pour supprimer l'objet sélectionné
     deleteSelectedObject() {
         const activeObject = this.canvas.getActiveObject();
         if (activeObject) {
@@ -1485,97 +1551,6 @@ class PhotoPaletteModule {
     }
 }
 
-// Module de Gestion des Gestes Tactiles avec Hammer.js et Fabric.js
-// Note : Assurez-vous de ne pas redéclarer cette classe si elle a déjà été définie dans la première partie
-// Si elle est déjà définie, vous pouvez commenter ou supprimer cette partie
-/*
-class TouchModule {
-    constructor(canvas, historyModule) {
-        this.canvas = canvas;
-        this.historyModule = historyModule;
-        this.hammer = null;
-    }
-
-    init() {
-        this.initHammer();
-        this.setupFabricTouchEvents();
-    }
-
-    initHammer() {
-        const canvasElement = this.canvas.upperCanvasEl;
-
-        // Initialiser Hammer.js uniquement pour le pincement
-        this.hammer = new Hammer.Manager(canvasElement);
-
-        const pinch = new Hammer.Pinch();
-        this.hammer.add([pinch]);
-
-        this.hammer.on('pinchstart pinchmove', (ev) => {
-            this.handlePinch(ev);
-        });
-    }
-
-    handlePinch(ev) {
-        let newZoom = this.canvas.getZoom() * ev.scale;
-
-        // Limiter le zoom
-        newZoom = Math.max(0.5, Math.min(newZoom, 3));
-
-        const center = new fabric.Point(ev.center.x - this.canvas._offset.left, ev.center.y - this.canvas._offset.top);
-        this.canvas.zoomToPoint(center, newZoom);
-    }
-
-    setupFabricTouchEvents() {
-        // Permettre le défilement tactile
-        this.canvas.allowTouchScrolling = true;
-
-        // Gestion du pan avec Fabric.js
-        let isPanning = false;
-        let lastPosX, lastPosY;
-
-        this.canvas.on('touch:gesture', (opt) => {
-            if (opt.e.touches && opt.e.touches.length === 2) {
-                // Désactiver le panning pendant le pincement
-                isPanning = false;
-            }
-        });
-
-        this.canvas.on('touch:drag', (opt) => {
-            if (opt.e.touches && opt.e.touches.length === 1) {
-                const e = opt.e;
-                if (isPanning) {
-                    const deltaX = e.touches[0].clientX - lastPosX;
-                    const deltaY = e.touches[0].clientY - lastPosY;
-                    lastPosX = e.touches[0].clientX;
-                    lastPosY = e.touches[0].clientY;
-
-                    const vpt = this.canvas.viewportTransform;
-                    vpt[4] += deltaX;
-                    vpt[5] += deltaY;
-                    this.canvas.requestRenderAll();
-                } else {
-                    isPanning = true;
-                    lastPosX = e.touches[0].clientX;
-                    lastPosY = e.touches[0].clientY;
-                }
-            }
-        });
-
-        this.canvas.on('touch:dragend', (opt) => {
-            isPanning = false;
-        });
-    }
-
-    destroyHammer() {
-        if (this.hammer) {
-            this.hammer.destroy();
-            this.hammer = null;
-        }
-    }
-}
-*/
-
-
 // Module de Gestion de l'Undo et Redo
 class UndoRedoModule {
     constructor(historyModule) {
@@ -1589,14 +1564,6 @@ class UndoRedoModule {
 
     // Ajoutez des méthodes supplémentaires si nécessaire
 }
-
-
-
-
-
-
-
-
 
 // Classe Principale de l'Application
 class App {
@@ -1614,7 +1581,6 @@ class App {
         this.photoPaletteModule = new PhotoPaletteModule(canvas, this.historyModule);
         this.pageModule = new PageModule(canvas, this.historyModule);
         this.undoRedoModule = new UndoRedoModule(this.historyModule);
-       
     }
 
     init() {
@@ -1630,7 +1596,6 @@ class App {
         this.photoPaletteModule.init();
         this.pageModule.init();
         this.undoRedoModule.init();
-       
 
         // Attacher les événements pour l'annulation et le rétablissement
         const undoBtn = document.getElementById('annuler-btn');
@@ -1654,6 +1619,23 @@ class App {
             resetViewBtn.addEventListener('click', () => this.resetView());
         } else {
             console.warn("Le bouton 'Réinitialiser Vue' avec l'ID 'reset-view-btn' est introuvable.");
+        }
+
+        // Attacher un nouvel événement pour le bouton "Supprimer l'objet"
+        const deleteObjectBtn = document.getElementById('delete-object');
+        if (deleteObjectBtn) {
+            deleteObjectBtn.addEventListener('click', () => {
+                const activeObject = this.canvas.getActiveObject();
+                if (activeObject) {
+                    // Supprimer l'objet sélectionné
+                    this.importExportModule.deleteSelectedObject();
+                } else {
+                    // Supprimer la page actuelle
+                    this.pageModule.deleteCurrentPage();
+                }
+            });
+        } else {
+            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
         }
 
         // Enregistrer l'état initial
@@ -1682,7 +1664,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Définir les propriétés de la première page au format A4
-    const pageModule = new PageModule(canvas, new HistoryModule(canvas));
+    const historyModule = new HistoryModule(canvas);
+    const pageModule = new PageModule(canvas, historyModule);
     pageModule.setupA4Canvas();
 
     // Ajuster le canevas lors du redimensionnement de la fenêtre (seulement la largeur)
