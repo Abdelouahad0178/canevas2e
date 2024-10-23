@@ -802,6 +802,7 @@ section {
     }
 
     .buttons button,
+    .upload,
     #add-text-btn,
     #show-calculator,
     #delete-object,
@@ -1089,13 +1090,23 @@ background-color: #1417b5;
 #upload-image{
 
 
+color:#007BFF;
 color: white;
+
    
 
 
 }
 
+.reviens{
 
+    font-size: 0.65rem;
+    padding: 3px 0;
+
+
+
+
+}
 .rename-input {
     width: 100%;
     font-size: 1rem;
