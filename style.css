@@ -1153,3 +1153,19 @@ color: white;
     margin: 5px;
     cursor: 'pointer';
 }
+/* Styles pour le bouton "Supprimer la Page" */
+#delete-page-btn {
+    padding: 10px;
+    background-color: #e74c3c; /* Couleur rouge pour indiquer la suppression */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Espace au-dessus si nécessaire */
+}
+
+#delete-page-btn:hover {
+    background-color: #c0392b;
+}
