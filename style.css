@@ -1169,3 +1169,73 @@ color: white;
 #delete-page-btn:hover {
     background-color: #c0392b;
 }
+/* Styles pour la calculatrice */
+#calculator-canvas {
+    position: absolute;
+    width: 280px;
+    height: auto;
+    top: 20%;
+    background-color: #be9f9f;
+    border: 1px solid #ccc;
+    display: none;
+    z-index: 9999;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.calculator-header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    cursor: move;
+    text-align: center;
+    font-size: 16px;
+    position: relative;
+}
+
+#close-canvas-calculator {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #fff;
+}
+
+#canvas-calc-display {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    box-sizing: border-box;
+    border: none;
+    text-align: right;
+    background-color: #eaeaea;
+    outline: none;
+}
+
+.calculator-buttons {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.calc-btn {
+    width: 25%;
+    padding: 15px;
+    font-size: 18px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.calc-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.calc-btn:active {
+    background-color: #d0d0d0;
+}

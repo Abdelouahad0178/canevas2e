@@ -376,8 +376,8 @@ class PageModule {
     }
 
     setupA4Canvas() {
-        const width = 210 * 3.7795275591; // Largeur A4 en pixels (210mm)
-        const height = 297 * 3.7795275591; // Hauteur A4 en pixels (297mm)
+        const width = 280 * 3.7795275591; // Largeur A4 en pixels (210mm)
+        const height = 410 * 3.7795275591; // Hauteur A4 en pixels (297mm)
         this.canvas.setWidth(width);
         this.canvas.setHeight(height);
         this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
@@ -999,10 +999,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // Module de Gestion de la Calculatrice Intégrée
 class CalculatorModule {
     constructor() {
-        this.calculatorCanvas = document.getElementById("calculator-canvas");
-        this.canvasCalcDisplay = document.getElementById("canvas-calc-display");
-        this.canvasCalcButtons = document.querySelectorAll("#calculator-canvas .calc-btn");
-        this.closeCanvasCalculatorBtn = document.getElementById("close-canvas-calculator");
+        this.calculatorCanvas = document.getElementById('calculator-canvas');
+        this.canvasCalcDisplay = document.getElementById('canvas-calc-display');
+        this.canvasCalcButtons = document.querySelectorAll('#calculator-canvas .calc-btn');
+        this.closeCanvasCalculatorBtn = document.getElementById('close-canvas-calculator');
     }
 
     init() {
@@ -1015,30 +1015,21 @@ class CalculatorModule {
         let isDragging = false;
         let offsetX, offsetY;
 
-        const getPointerPosition = (e) => {
-            if (e.touches) {
-                return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            } else {
-                return { x: e.clientX, y: e.clientY };
-            }
-        };
-
         const startDrag = (e) => {
             isDragging = true;
-            const pointer = getPointerPosition(e);
             const rect = this.calculatorCanvas.getBoundingClientRect();
-            offsetX = pointer.x - rect.left;
-            offsetY = pointer.y - rect.top;
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
             this.calculatorCanvas.style.cursor = 'move';
             e.preventDefault();
         };
 
         const drag = (e) => {
             if (isDragging) {
-                const pointer = getPointerPosition(e);
-                let newLeft = pointer.x - offsetX - 90;
-                let newTop = pointer.y - offsetY - 80;
+                let newLeft = e.clientX - offsetX;
+                let newTop = e.clientY - offsetY;
 
+                // Limiter le déplacement à l'écran
                 const windowWidth = window.innerWidth;
                 const windowHeight = window.innerHeight;
                 const calcWidth = this.calculatorCanvas.offsetWidth;
@@ -1057,49 +1048,46 @@ class CalculatorModule {
             this.calculatorCanvas.style.cursor = 'default';
         };
 
-        const calculatorHeader = this.calculatorCanvas.querySelector('h3');
+        const calculatorHeader = this.calculatorCanvas.querySelector('.calculator-header');
         if (calculatorHeader) {
             calculatorHeader.addEventListener('mousedown', startDrag);
-            calculatorHeader.addEventListener('touchstart', startDrag);
         } else {
             console.warn("Le titre de la calculatrice est introuvable.");
         }
 
         document.addEventListener('mousemove', drag);
-        document.addEventListener('touchmove', drag);
         document.addEventListener('mouseup', stopDrag);
-        document.addEventListener('touchend', stopDrag);
     }
 
     setupButtons() {
         this.canvasCalcButtons.forEach(button => {
-            button.addEventListener("click", () => this.handleCalcButton(button.textContent));
+            button.addEventListener('click', () => this.handleCalcButton(button.textContent));
         });
 
         if (this.closeCanvasCalculatorBtn) {
-            this.closeCanvasCalculatorBtn.addEventListener("click", () => this.hideCalculator());
+            this.closeCanvasCalculatorBtn.addEventListener('click', () => this.hideCalculator());
         } else {
             console.warn("Le bouton 'Fermer' de la calculatrice est introuvable.");
         }
     }
 
     setupVisibility() {
-        const showCalculatorBtn = document.getElementById("show-calculator");
+        const showCalculatorBtn = document.getElementById('show-calculator');
         if (showCalculatorBtn) {
-            showCalculatorBtn.addEventListener("click", () => this.showCalculator());
+            showCalculatorBtn.addEventListener('click', () => this.showCalculator());
         } else {
             console.warn("Le bouton 'Calculatrice' avec l'ID 'show-calculator' est introuvable.");
         }
     }
 
     handleCalcButton(value) {
-        if (value === "C") {
-            this.canvasCalcDisplay.value = "";
-        } else if (value === "=") {
+        if (value === 'C') {
+            this.canvasCalcDisplay.value = '';
+        } else if (value === '=') {
             try {
-                this.canvasCalcDisplay.value = Function('"use strict";return (' + this.canvasCalcDisplay.value + ')')();
+                this.canvasCalcDisplay.value = eval(this.canvasCalcDisplay.value);
             } catch {
-                this.canvasCalcDisplay.value = "Erreur";
+                this.canvasCalcDisplay.value = 'Erreur';
             }
         } else {
             this.canvasCalcDisplay.value += value;
@@ -1110,14 +1098,13 @@ class CalculatorModule {
         if (this.calculatorCanvas) {
             this.calculatorCanvas.style.display = 'block';
             this.calculatorCanvas.style.zIndex = 9999;
-            if (!this.calculatorCanvas.style.left || !this.calculatorCanvas.style.top) {
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-                const calcWidth = this.calculatorCanvas.offsetWidth;
-                const calcHeight = this.calculatorCanvas.offsetHeight;
-                this.calculatorCanvas.style.left = `${(windowWidth - calcWidth) / 2}px`;
-                this.calculatorCanvas.style.top = `${(windowHeight - calcHeight) / 2}px`;
-            }
+            // Centrer la calculatrice à l'écran
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const calcWidth = this.calculatorCanvas.offsetWidth;
+            const calcHeight = this.calculatorCanvas.offsetHeight;
+            this.calculatorCanvas.style.left = `${(windowWidth - calcWidth) / 2}px`;
+            this.calculatorCanvas.style.top = `${(windowHeight - calcHeight) / 2}px`;
         } else {
             console.warn("La calculatrice avec l'ID 'calculator-canvas' est introuvable.");
         }
