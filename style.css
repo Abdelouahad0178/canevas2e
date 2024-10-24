@@ -14,7 +14,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: #f0f2f5; /* Couleur de fond douce */
+    background: #f0f2f5;
     flex-direction: column;
 }
 
@@ -70,85 +70,6 @@ section {
     position: relative;
 }
 
-/* Sélecteur de couleur */
-.colors .options {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.colors .option {
-    height: 24px;
-    width: 24px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    transition: border 0.3s;
-}
-
-.colors .option.selected::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 12px;
-    width: 12px;
-    background: inherit;
-    border-radius: inherit;
-    transform: translate(-50%, -50%);
-    border: 2px solid #fff;
-}
-
-/* Sélecteur de couleur personnalisé */
-.option #color-picker {
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-/* Sélecteur de couleur des formes */
-#shape-color-picker {
-    width: 24px;
-    height: 24px;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    border-radius: 50%;
-}
-
-/* Curseur de taille */
-#size-slider {
-    width: 100%;
-    height: 5px;
-    border-radius: 5px;
-    appearance: none;
-    background: #ddd;
-    outline: none;
-    transition: background 0.3s;
-}
-
-#size-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #4A98F7;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-#size-slider::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background: #4A98F7;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
 /* Boutons d'action */
 .buttons {
     display: flex;
@@ -156,12 +77,12 @@ section {
     gap: 10px;
 }
 
-#add-page-btn,
+/* Boutons généraux */
 .buttons button,
+#add-page-btn,
 #add-text-btn,
 #show-calculator,
 #delete-object,
-#add-ruler,
 #delete-measurement-text,
 #save-json,
 .load-json-btn,
@@ -182,10 +103,10 @@ section {
 }
 
 .buttons button:hover,
+#add-page-btn:hover,
 #add-text-btn:hover,
 #show-calculator:hover,
 #delete-object:hover,
-#add-ruler:hover,
 #delete-measurement-text:hover,
 #save-json:hover,
 .load-json-btn:hover,
@@ -222,13 +143,13 @@ section {
     width: 100%;
     border: 2px solid #ddd;
     border-radius: 8px;
-    overflow: auto; /* Permet le défilement vertical */
-    height: 100vh; /* Hauteur de la fenêtre */
+    overflow: auto;
+    height: 100vh;
 }
 
 .drawing-board canvas {
     width: 100%;
-    height: auto; /* Permet au canevas de définir sa propre hauteur via JS */
+    height: auto;
 }
 
 /* Bouton de duplication flottant */
@@ -245,7 +166,7 @@ section {
     z-index: 1000;
     transform: translate(-50%, -100%);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s, background 0.3s;
+    transition: background-color 0.3s;
     width: 30px;
     height: 30px;
     display: flex;
@@ -259,1074 +180,23 @@ section {
 
 /* Menu des propriétés de texte */
 #text-properties-menu {
-    position: fixed; /* Position fixe pour rester visible */
-    right: 20px; /* Toujours à droite */
-    top: 30%; /* Centré verticalement */
-    transform: translateY(-50%); /* Ajuste le centrage */
+    position: fixed;
+    right: 20px;
+    top: 30%;
+    transform: translateY(-50%);
     background: #fff;
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
+    display: none;
     flex-direction: column;
     gap: 10px;
-    z-index: 1000; /* Assurez-vous qu'il est au-dessus des autres éléments */
-}
-
-/* Responsivité pour le menu des propriétés de texte */
-@media (max-width: 768px) {
-    #text-properties-menu {
-        width: 90%; /* Largeur ajustée pour les petits écrans */
-        right: 5%; /* Ajustement à droite pour petits écrans */
-    }
-}
-
-@media (max-width: 480px) {
-    #text-properties-menu {
-        width: 95%; /* Largeur presque complète pour les très petits écrans */
-        right: 2%; /* Ajustement supplémentaire à droite */
-    }
+    z-index: 1000;
 }
 
 /* Calculatrice intégrée */
 #calculator-canvas {
     position: absolute;
-    z-index: 9999; /* Assurez-vous que la calculatrice est au-dessus de tout */
-    left: 50%;
-    top: 40%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    cursor: move;
-    display: none;
-    width: 300px;
-}
-
-#calculator-canvas h3 {
-    margin-bottom: 15px;
-    cursor: move;
-}
-
-#canvas-calc-display {
-    width: 100%;
-    padding: 10px;
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.calculator-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.calc-btn {
-    padding: 15px 0;
-    font-size: 1.2rem;
-    background: #4A98F7;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.calc-btn:hover {
-    background: #3672c7;
-}
-
-/* Bouton de fermeture de la calculatrice */
-#close-canvas-calculator {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.2rem;
-    color: #aaa;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-#close-canvas-calculator:hover {
-    color: #000;
-}
-
-/* Modales */
-.modal {
-    position: fixed;
-    z-index: 10000; /* Assurez-vous que la modale est au-dessus de tout */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto; /* Permet le défilement si nécessaire */
-    background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-    display: none;
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 5% auto; /* 5% du haut et centré horizontalement */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 90%; /* Largeur de la modale */
-    max-width: 800px; /* Largeur maximale */
-    border-radius: 10px;
-    text-align: center;
-    position: relative;
-}
-
-.close-modal {
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.close-modal:hover,
-.close-modal:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-#preview-image {
-    width: 100%;
-    height: auto;
-    border: 1px solid #ddd;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-#print-btn {
-    padding: 10px 20px;
-    background-color: #4A98F7;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-}
-
-#print-btn:hover {
-    background-color: #3672c7;
-}
-
-/* Aperçu Avant Impression */
-#print-preview-modal {
-    /* Hérité des styles généraux des modales */
-}
-
-#print-preview-modal .modal-content {
-    /* Style spécifique si nécessaire */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* Palette de Photos */
-#photo-palette-modal {
-    /* Hérité des styles généraux des modales */
-}
-
-#photo-palette-modal .modal-content {
-    max-width: 90%;
-    max-height: 90%;
-    overflow-y: auto;
-    padding: 20px;
-}
-
-#photo-palette-modal .modal-content h2 {
-    margin-bottom: 15px;
-}
-
-#photo-palette-modal .close-modal {
-    top: 10px;
-    right: 20px;
-}
-
-/* Galerie de Photos */
-#photo-gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-#photo-gallery img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    cursor: pointer;
-    border: 2px solid transparent;
-    border-radius: 5px;
-    transition: border 0.3s;
-}
-
-#photo-gallery img:hover {
-    border: 2px solid #4A98F7;
-}
-
-#photo-search {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-/* Sélecteur de remplissage des formes */
-.option input[type="radio"] {
-    display: none;
-}
-
-.option input[type="radio"] + label {
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #333;
-}
-
-.option input[type="radio"]:checked + label {
-    color: #4A98F7;
-    font-weight: 500;
-}
-
-/* Styles pour les champs de recherche */
-#photo-search::placeholder {
-    color: #aaa;
-    font-style: italic;
-}
-
-/* Styles pour le texte de mesure associé aux formes */
-.measurement-text,
-.ruler-text {
-    background: rgba(255, 255, 255, 0.7);
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-/* Texte dans le canevas */
-.fabric-text {
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Calculatrice Aperçu Avant Impression */
-#print-preview-modal .modal-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.active {
-    background-color: #f5f1f1;
-    padding: 2px;
-    margin: 3px;
-    color: #007BFF;
-    border-radius: 3px;
-}
-
-.active:hover {
-    background-color: #f5f1f1;
-    padding: 2px;
-    margin: 3px;
-    color: #2266af;
-    border-radius: 3px;
-}
-
-
-
-/* Responsivité */
-
-/* Pour les écrans de 1440px et plus */
-@media (min-width: 1440px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 300px;
-    }
-
-    .drawing-board {
-        flex: 1;
-    }
-}
-
-/* Pour les écrans entre 1024px et 1439px */
-@media (min-width: 1024px) and (max-width: 1439px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 250px;
-    }
-
-    .drawing-board {
-        flex: 1;
-    }
-}
-
-/* Pour les écrans entre 992px et 1023px */
-@media (min-width: 992px) and (max-width: 1023px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 20%;
-    }
-
-    .drawing-board {
-        flex: 1;
-    }
-
-    .title {
-        font-size: 16px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.9rem;
-        padding: 8px 0;
-    }
-
-    .calc-btn {
-        padding: 18px;
-        font-size: 1.1rem;
-    }
-}
-
-/* Pour les écrans entre 882px et 991px */
-@media (min-width: 882px) and (max-width: 991px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 20%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 1240px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 16px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.9rem;
-        padding: 8px 0;
-    }
-
-    .calc-btn {
-        padding: 18px;
-        font-size: 1.1rem;
-    }
-}
-
-/* Pour les écrans entre 720px et 881px */
-@media (min-width: 720px) and (max-width: 881px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 20%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 1240px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 15px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.85rem;
-        padding: 7px 0;
-    }
-
-    .calc-btn {
-        padding: 16px;
-        font-size: 1rem;
-    }
-
-    .text-properties {
-        flex-direction: column;
-        gap: 10px;
-        padding: 10px;
-    }
-}
-
-/* Pour les écrans entre 620px et 719px */
-@media (min-width: 620px) and (max-width: 719px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 20%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 1240px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 14px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.8rem;
-        padding: 6px 0;
-    }
-
-    .calc-btn {
-        padding: 14px;
-        font-size: 0.95rem;
-    }
-
-    .text-properties {
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px;
-    }
-}
-
-/* Pour les écrans entre 552px et 619px */
-@media (min-width: 552px) and (max-width: 619px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 20%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 820px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 10px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.75rem;
-        padding: 5px 0;
-    }
-
-    .calc-btn {
-        padding: 12px;
-        font-size: 0.9rem;
-    }
-
-    .text-properties {
-        flex-direction: column;
-        gap: 6px;
-        padding: 6px;
-    }
-}
-
-/* Pour les écrans entre 414px et 551px */
-@media (min-width: 414px) and (max-width: 551px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 30%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 800px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 10px;
-    }
-
-    .buttons button,
-    .upload,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.7rem;
-        padding: 4px 0;
-    }
-
-    .calc-btn {
-        padding: 10px;
-        font-size: 0.8rem;
-    }
-
-    .text-properties {
-        flex-direction: column;
-        gap: 4px;
-        padding: 4px;
-    }
-
-    /* Ajustement de la calculatrice */
-    #calculator-canvas {
-        width: 90%;
-        padding: 15px;
-        margin-top: 20%;
-    }
-
-    #canvas-calc-display {
-        font-size: 1.1rem;
-    }
-
-    .calculator-buttons {
-        gap: 10px;
-    }
-
-    .calc-btn {
-        padding: 10px;
-        font-size: 0.8rem;
-    }
-}
-
-/* Pour les écrans jusqu'à 413px */
-@media (max-width: 413px) {
-    .container {
-        flex-direction: row;
-    }
-
-    .tools-board {
-        width: 39%;
-    }
-
-    .drawing-board {
-        width: 100%;
-        height: 800px; /* Ajustez selon vos besoins */
-    }
-
-    .title {
-        font-size: 8px;
-    }
-
-    .buttons button,
-    #add-text-btn,
-    #show-calculator,
-    #delete-object,
-    #add-ruler,
-    #delete-measurement-text,
-    #save-json,
-    .load-json-btn {
-        font-size: 0.65rem;
-        padding: 3px 0;
-    }
-
-    .calc-btn {
-        padding: 8px;
-        font-size: 0.75rem;
-    }
-
-    .text-properties {
-        flex-direction: column;
-        gap: 4px;
-        padding: 4px;
-    }
-
-    /* Ajustement de la calculatrice */
-    #calculator-canvas {
-        width: 90%;
-        padding: 10px;
-    }
-
-    #canvas-calc-display {
-        font-size: 1rem;
-    }
-
-    .calculator-buttons {
-        gap: 8px;
-    }
-
-    .calc-btn {
-        padding: 8px;
-        font-size: 0.75rem;
-    }
-}
-
-/* Ajustements généraux pour les écrans plus petits */
-@media (max-width: 1440px) {
-    /* Ajuster la hauteur du canevas pour les écrans légèrement plus petits */
-    .drawing-board canvas {
-        height: 90vh;
-    }
-}
-
-@media (max-width: 768px) {
-    /* Sur les tablettes, ajuster la disposition si nécessaire */
-    #text-properties-menu {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
-
-/* Styles spécifiques pour les éléments interactifs */
-
-/* Bouton "Ajouter Texte" */
-#add-text-btn {
-    background-color: #007BFF;
-}
-
-#add-text-btn:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Calculatrice" */
-#show-calculator {
-    background-color: #007BFF;
-}
-
-#show-calculator:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Supprimer l'objet" */
-#delete-object {
-    background-color: #007BFF;
-}
-
-#delete-object:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Supprimer le texte de mesure" */
-#delete-measurement-text {
-    background-color: #007BFF;
-}
-
-#delete-measurement-text:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Enregistrer en JSON" */
-#save-json {
-    background-color: #2980b9;
-}
-
-#save-json:hover {
-    background-color: #1c5980;
-}
-
-/* Bouton "Ajouter un Tableau" */
-#add-table-btn {
-    background-color: #007BFF;
-}
-
-#add-table-btn:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Annuler" */
-#annuler-btn {
-    background-color: #007BFF;
-}
-
-#annuler-btn:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Rétablir" */
-#rétablir-btn {
-    background-color: #007BFF;
-}
-
-#rétablir-btn:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Ouvrir la Palette de Photos" */
-#open-photo-palette-btn {
-    background-color: #007BFF;
-}
-
-#open-photo-palette-btn:hover {
-    background-color: #626f98;
-}
-
-/* Bouton "Aperçu Avant Impression" */
-#print-preview-btn {
-    background-color: #007BFF;
-}
-
-#print-preview-btn:hover {
-    background-color: #626f98;
-}
-
-/* Sélecteur de remplissage des formes */
-.option input[type="radio"] {
-    display: none;
-}
-
-.option input[type="radio"] + label {
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #333;
-}
-
-.option input[type="radio"]:checked + label {
-    color: #4A98F7;
-    font-weight: 500;
-}
-
-/* Styles pour les champs de recherche */
-#photo-search::placeholder {
-    color: #aaa;
-    font-style: italic;
-}
-
-/* Styles pour le texte de mesure associé aux formes */
-.measurement-text,
-.ruler-text {
-    background: rgba(255, 255, 255, 0.7);
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-/* Texte dans le canevas */
-.fabric-text {
-    font-family: 'Poppins', sans-serif;
-}
-
-/* Calculatrice Aperçu Avant Impression */
-#print-preview-modal .modal-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.spane{
-
-
-    background-color: rgb(215, 215, 225);
-     border: 1px solid; 
-     padding: 2px 6px;
-      border-radius: 5px;
-
-
-}
-.spane:hover{
-
-
-    background-color: rgb(154, 154, 181);
-     border: 1px solid; 
-     padding: 2px 6px;
-      border-radius: 5px;
-
-
-}
-#add-page-btn:hover{
-
-
-background-color: #1417b5;
-
-
-}
-#upload-image{
-
-
-color:#007BFF;
-color: white;
-
-   
-
-
-}
-
-.reviens{
-
-    font-size: 0.65rem;
-    padding: 3px 0;
-
-
-
-
-}
-.rename-input {
-    width: 100%;
-    font-size: 1rem;
-    padding: 2px 5px;
-    border: 1px solid #4A98F7;
-    border-radius: 3px;
-}
-.duplicate-btn {
-    position: absolute;
-    background-color: #ffffff;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
-    z-index: 10000;
-    /* Ajoutez d'autres styles selon vos préférences */
-}
-
-/* Styles pour les modals */
-.close-modal {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 30px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#print-preview-modal, #photo-palette-modal, #calculator-canvas {
-    display: none; /* Masquer les modals par défaut */
-    position: fixed;
-    z-index: 1000;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #fefefe;
-    padding: 20px;
-    border: 1px solid #888;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-/* Styles pour la calculatrice */
-#calculator-canvas {
-    width: 200px;
-    height: 300px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-/* Styles pour la palette de photos */
-#photo-gallery img {
-    width: 100px;
-    height: auto;
-    margin: 5px;
-    cursor: 'pointer';
-}
-/* Styles pour le bouton "Supprimer la Page" */
-#delete-page-btn {
-    padding: 10px;
-    background-color: #e74c3c; /* Couleur rouge pour indiquer la suppression */
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-    margin-top: 10px; /* Espace au-dessus si nécessaire */
-}
-
-#delete-page-btn:hover {
-    background-color: #c0392b;
-}
-/* Styles pour la calculatrice */
-#calculator-canvas {
-    position: absolute;
-    width: 280px;
-    height: auto;
-    top: 20%;
-    background-color: #be9f9f;
-    border: 1px solid #ccc;
-    display: none;
-    z-index: 9999;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
-
-.calculator-header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    cursor: move;
-    text-align: center;
-    font-size: 16px;
-    position: relative;
-}
-
-#close-canvas-calculator {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #fff;
-}
-
-#canvas-calc-display {
-    width: 100%;
-    padding: 10px;
-    font-size: 18px;
-    box-sizing: border-box;
-    border: none;
-    text-align: right;
-    background-color: #eaeaea;
-    outline: none;
-}
-
-.calculator-buttons {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.calc-btn {
-    width: 25%;
-    padding: 15px;
-    font-size: 18px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
-    outline: none;
-}
-
-.calc-btn:hover {
-    background-color: #e0e0e0;
-}
-
-.calc-btn:active {
-    background-color: #d0d0d0;
-}
-/* Styles pour la calculatrice */
-#calculator-canvas {
-    position: absolute;
-    width: 260px;
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    display: none;
-    z-index: 9999;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    top: 30%;
-}
-
-.calculator-header {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    cursor: move;
-    text-align: center;
-    font-size: 16px;
-    position: relative;
-}
-
-#close-canvas-calculator {
-    position: absolute;
-    top: 5px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: #fff;
-}
-
-#canvas-calc-display {
-    width: 100%;
-    padding: 10px;
-    font-size: 18px;
-    box-sizing: border-box;
-    border: none;
-    text-align: right;
-    background-color: #eaeaea;
-    outline: none;
-}
-
-.calculator-buttons {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.calc-btn {
-    width: 25%;
-    padding: 15px;
-    font-size: 18px;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    cursor: pointer;
-    outline: none;
-    text-align: center;
-}
-
-.calc-btn:hover {
-    background-color: #e0e0e0;
-}
-
-.calc-btn:active {
-    background-color: #d0d0d0;
-}
-
-
-
-
-/* Styles pour la calculatrice */
-#calculator-canvas {
-    position: absolute; /* Positionnement absolu pour pouvoir placer la calculatrice au-dessus du canevas */
     width: 260px;
     background-color: #c2b9d0;
     border: 1px solid #ccc;
@@ -1335,7 +205,7 @@ color: white;
     border-radius: 5px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
-    
+    top: 30%;
 }
 
 .calculator-header {
@@ -1393,4 +263,575 @@ color: white;
 
 .calc-btn:active {
     background-color: #d0d0d0;
+}
+
+/* Modales */
+.modal {
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.close-modal {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#preview-image {
+    width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+#print-btn {
+    padding: 10px 20px;
+    background-color: #4A98F7;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+#print-btn:hover {
+    background-color: #3672c7;
+}
+
+/* Palette de Photos */
+#photo-palette-modal .modal-content {
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+#photo-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#photo-gallery img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    transition: border 0.3s;
+}
+
+#photo-gallery img:hover {
+    border: 2px solid #4A98F7;
+}
+
+#photo-search {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.spane {
+    background-color: rgb(215, 215, 225);
+    border: 1px solid;
+    padding: 2px 6px;
+    border-radius: 5px;
+}
+
+.spane:hover {
+    background-color: rgb(154, 154, 181);
+    border: 1px solid;
+    padding: 2px 6px;
+    border-radius: 5px;
+}
+
+#add-page-btn:hover {
+    background-color: #1417b5;
+}
+
+#upload-image {
+    color: white;
+}
+
+.reviens {
+    font-size: 0.65rem;
+    padding: 3px 0;
+}
+
+.rename-input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 2px 5px;
+    border: 1px solid #4A98F7;
+    border-radius: 3px;
+}
+
+/* Sélecteur de remplissage des formes */
+.option input[type="radio"] {
+    display: none;
+}
+
+.option input[type="radio"] + label {
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.option input[type="radio"]:checked + label {
+    color: #4A98F7;
+    font-weight: 500;
+}
+
+/* Styles pour les champs de recherche */
+#photo-search::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Styles pour le texte de mesure associé aux formes */
+.measurement-text,
+.ruler-text {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Texte dans le canevas */
+.fabric-text {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Responsivité */
+
+/* Pour les écrans de 1440px et plus */
+@media (min-width: 1440px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 300px;
+    }
+
+    .drawing-board {
+        flex: 1;
+    }
+}
+
+/* Pour les écrans de 1024px à 1439px */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 250px;
+    }
+
+    .drawing-board {
+        flex: 1;
+    }
+}
+
+/* Pour les écrans de 992px à 1023px */
+@media (min-width: 992px) and (max-width: 1023px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 20%;
+    }
+
+    .drawing-board {
+        flex: 1;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.9rem;
+        padding: 8px 0;
+    }
+
+    .calc-btn {
+        padding: 18px;
+        font-size: 1.1rem;
+    }
+}
+
+/* Pour les écrans de 820px à 991px */
+@media (min-width: 820px) and (max-width: 991px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 25%;
+    }
+
+    .drawing-board {
+        flex: 1;
+    }
+}
+
+/* Pour les écrans de 720px à 819px */
+@media (min-width: 720px) and (max-width: 819px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 20%;
+    }
+
+    .drawing-board {
+        flex: 1;
+    }
+
+    .title {
+        font-size: 15px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.85rem;
+        padding: 7px 0;
+    }
+
+    .calc-btn {
+        padding: 16px;
+        font-size: 1rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+    }
+}
+
+/* Pour les écrans de 620px à 719px */
+@media (min-width: 620px) and (max-width: 719px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 20%;
+    }
+
+    .drawing-board {
+        flex: 1;
+        height: 1240px; /* Ajustez selon vos besoins */
+    }
+
+    .title {
+        font-size: 14px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.8rem;
+        padding: 6px 0;
+    }
+
+    .calc-btn {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+    }
+}
+
+/* Pour les écrans de 552px à 619px */
+@media (min-width: 552px) and (max-width: 619px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 20%;
+    }
+
+    .drawing-board {
+        flex: 1;
+        height: 1240px; /* Ajustez selon vos besoins */
+    }
+
+    .title {
+        font-size: 10px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.75rem;
+        padding: 5px 0;
+    }
+
+    .calc-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 6px;
+        padding: 6px;
+    }
+}
+
+/* Pour les écrans de 420px à 551px */
+@media (min-width: 420px) and (max-width: 551px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 30%;
+    }
+
+    .drawing-board {
+        flex: 1;
+        height: 800px; /* Ajustez selon vos besoins */
+    }
+
+    .title {
+        font-size: 10px;
+    }
+
+    .buttons button,
+    .upload,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.7rem;
+        padding: 4px 0;
+    }
+
+    .calc-btn {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 4px;
+        padding: 4px;
+    }
+
+    /* Ajustement de la calculatrice */
+    #calculator-canvas {
+        width: 90%;
+        padding: 15px;
+        margin-top: 20%;
+    }
+
+    #canvas-calc-display {
+        font-size: 1.1rem;
+    }
+
+    .calculator-buttons {
+        gap: 10px;
+    }
+
+    .calc-btn {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Pour les écrans de 360px à 419px */
+@media (min-width: 360px) and (max-width: 419px) {
+    .container {
+        flex-direction: row;
+    }
+
+    .tools-board {
+        width: 39%;
+    }
+
+    .drawing-board {
+        flex: 1;
+        height: 800px; /* Ajustez selon vos besoins */
+    }
+
+    .title {
+        font-size: 8px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.65rem;
+        padding: 3px 0;
+    }
+
+    .calc-btn {
+        padding: 8px;
+        font-size: 0.75rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 4px;
+        padding: 4px;
+    }
+
+    /* Ajustement de la calculatrice */
+    #calculator-canvas {
+        width: 90%;
+        padding: 10px;
+    }
+
+    #canvas-calc-display {
+        font-size: 1rem;
+    }
+
+    .calculator-buttons {
+        gap: 8px;
+    }
+
+    .calc-btn {
+        padding: 8px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Pour les écrans jusqu'à 359px */
+@media (max-width: 359px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .tools-board {
+        width: 100%;
+    }
+
+    .drawing-board {
+        flex: 1;
+        height: 600px; /* Ajustez selon vos besoins */
+    }
+
+    .title {
+        font-size: 7px;
+    }
+
+    .buttons button,
+    #add-text-btn,
+    #show-calculator,
+    #delete-object,
+    #delete-measurement-text,
+    #save-json,
+    .load-json-btn {
+        font-size: 0.6rem;
+        padding: 2px 0;
+    }
+
+    .calc-btn {
+        padding: 6px;
+        font-size: 0.7rem;
+    }
+
+    .text-properties {
+        flex-direction: column;
+        gap: 2px;
+        padding: 2px;
+    }
+
+    /* Ajustement de la calculatrice */
+    #calculator-canvas {
+        width: 95%;
+        padding: 8px;
+        margin-top: 15%;
+    }
+
+    #canvas-calc-display {
+        font-size: 0.9rem;
+    }
+
+    .calculator-buttons {
+        gap: 6px;
+    }
+
+    .calc-btn {
+        padding: 6px;
+        font-size: 0.7rem;
+    }
 }
