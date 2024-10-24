@@ -24,7 +24,7 @@ body {
     width: 100%;
     gap: 10px;
     padding: 10px;
-    max-width: 1440px;
+    width: 1440px;
     flex-direction: column;
     filter: drop-shadow(0 50px 20px rgba(0, 0, 0, 0.1));
 }
@@ -149,7 +149,7 @@ section {
 
 .drawing-board canvas {
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
 /* Bouton de duplication flottant */
