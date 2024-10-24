@@ -118,6 +118,34 @@ section {
     background-color: #3672c7;
 }
 
+
+
+
+
+#delete-page-btn{
+
+background-color: rgb(228, 125, 125);
+padding: 4%;
+border-radius: 5px;
+color: white;
+font-size: 14px;
+
+}
+
+
+
+
+#delete-page-btn:hover{
+
+    background-color: rgb(237, 36, 36);
+    padding: 4%;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    
+    }
+
+
 /* Bouton spécifique pour la gomme */
 #eraser {
     background-color: #e74c3c;
