@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,26 +8,19 @@
     <link rel="stylesheet" href="style.css">
     <!-- Bibliothèques externes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-    <!-- Importation de Hammer.js pour les gestes tactiles -->
-    <script defer src="script.js"></script>
     <!-- Votre script principal -->
+    <script defer src="script.js"></script>
 </head>
 <body>
     <div class="container">
         <section class="tools-board">
-            <h2 class="title"></h2>
-            
             <!-- Gestion des Pages -->
             <div class="row">
-                <h3></h3>
                 <div class="page-controls">
-                    <button id="add-page-btn">➕  Page</button>
-                    <button id="prev-page-btn" style="display: none;">◀️ </button>
-                    <button id="next-page-btn" style="display: none;"> ▶️</button>
-                    <!-- Bouton pour supprimer la page actuelle -->
+                    <button id="add-page-btn">➕ Page</button>
+                    <button id="prev-page-btn">◀️</button>
+                    <button id="next-page-btn">▶️</button>
                     <button id="delete-page-btn">🗑️ Page</button>
-
                 </div>
                 <div id="page-list" class="page-list">
                     <!-- Les boutons de pages seront ajoutés dynamiquement ici -->
@@ -37,10 +31,10 @@
             <div class="row">
                 <ul class="options">
                     <li class="option tool" id="rectangle">
-                        <span style="cursor: pointer;" class="spane"> 🔲</span>
+                        <span class="spane">🔲</span>
                     </li>
                     <li class="option tool" id="circle">
-                        <span class="spane"> ⚪</span>
+                        <span class="spane">⚪</span>
                     </li>
                     <li class="option tool" id="triangle">
                         <span class="spane">🔺</span>
@@ -61,24 +55,15 @@
                 </div>
             </div>
 
-        
-           <!-- Sélecteur de couleur unique -->
-<div class="row">
-    <h3></h3>
-    
-    <input type="color" id="unified-color-picker" value="#000000">
+            <!-- Sélecteur de couleur unique -->
+            <div class="row">
+                <input type="color" id="unified-color-picker" value="#000000">
+            </div>
 
-</div>
-
-
-           <!-- Curseur de taille unique -->
-<div class="row">
-    <h3></h3>
-    <input type="range" id="unified-size-slider" min="1" max="100" value="10">
-    
-    
-</div>
-
+            <!-- Curseur de taille unique -->
+            <div class="row">
+                <input type="range" id="unified-size-slider" min="1" max="100" value="10">
+            </div>
 
             <!-- Boutons d'action -->
             <div class="row buttons">
@@ -86,68 +71,33 @@
                 <button id="eraser">🧽 Gomme</button>
                 <button class="clear-canvas">🗑️ Canevas</button>
                 <button class="save-img">💾 Image</button>
-                <!-- Bouton pour ajouter du texte -->
                 <button id="add-text-btn">Ajouter Texte</button>
             </div>
 
             <!-- Bouton pour charger une image -->
             <div class="row buttons">
-
-              <button class="upload">  <input type="file" id="upload-image" class="reviens" accept="image/*"></button>
-
+                <label for="upload-image" class="upload-label">📁 Importer Image</label>
+                <input type="file" id="upload-image" accept="image/*" style="display: none;">
             </div>
 
+            <!-- Boutons pour sauvegarder et charger en JSON -->
             <div class="row buttons">
-                <button id="save-json">💾 JSON</button>
+                <button id="save-json">💾 Sauvegarder JSON</button>
+                <label for="load-json" class="load-json-btn">📁 Charger JSON</label>
                 <input type="file" id="load-json" accept=".json" style="display: none;">
-                <label for="load-json" class="load-json-btn">📁 JSON</label>
             </div>
 
+            <!-- Autres boutons -->
             <div class="row buttons">
-                <button id="delete-object">🗑️ Objet</button>
-            </div>
-
-            <div class="row buttons">
-                <button id="delete-measurement-text">🗑️ Texte </button>
-            </div>
-
-            <div class="row buttons">
-                <button id="show-calculator"> 🧮 Calculatrice</button>
-            </div>
-
-            <!-- Bouton pour insérer un tableau -->
-            <button id="add-table-btn">🧮 Tableau</button>
-
-            <div class="row buttons">
+                <button id="delete-object">🗑️ Supprimer Objet</button>
+                <button id="delete-measurement-text">🗑️ Supprimer Texte de Mesure</button>
+                <button id="show-calculator">🧮 Calculatrice</button>
+                <button id="add-table-btn">📊 Tableau</button>
                 <button id="annuler-btn">↩️ Annuler</button>
                 <button id="rétablir-btn">↪️ Rétablir</button>
-            </div>
-
-            <!-- Bouton pour réinitialiser la vue -->
-            <div class="row buttons">
-                <button id="reset-view-btn">Réinitialiser Vue</button>
-            </div>
-
-            <!-- Bouton pour Aperçu Avant Impression -->
-            <div class="row buttons">
+                <button id="reset-view-btn">🔄 Réinitialiser Vue</button>
                 <button id="print-preview-btn">🖨️ Impression</button>
-            </div>
-
-            <!-- Palette de Photos -->
-            <div class="row buttons">
-                <button id="open-photo-palette-btn">📁 Photos</button>
-            </div>
-
-            <!-- Fenêtre Palette de Photos -->
-            <div id="photo-palette-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Palette de Photos</h2>
-                    <input type="text" id="photo-search" placeholder="Rechercher des photos..." />
-                    <div id="photo-gallery" class="photo-gallery">
-                        <!-- Les photos seront chargées ici dynamiquement -->
-                    </div>
-                </div>
+                <button id="open-photo-palette-btn">🖼️ Photos</button>
             </div>
         </section>
 
@@ -158,7 +108,10 @@
 
     <!-- Fenêtre calculatrice -->
     <div id="calculator-canvas" class="calculator" style="display: none;">
-        <h3 style="color: blue;">Calculatrice</h3>
+        <div class="calculator-header">
+            <h3 style="color: blue;">Calculatrice</h3>
+            <button id="close-canvas-calculator">Fermer</button>
+        </div>
         <input type="text" id="canvas-calc-display" disabled>
         <div class="calculator-buttons">
             <button class="calc-btn">7</button>
@@ -177,9 +130,8 @@
             <button class="calc-btn">.</button>
             <button class="calc-btn">=</button>
             <button class="calc-btn">+</button>
-            <button class="calc-btn" id="canvas-calc-clear">C</button>
+            <button class="calc-btn">C</button>
         </div>
-        <button id="close-canvas-calculator">Fermer</button>
     </div>
 
     <!-- Menu des propriétés de texte -->
@@ -209,9 +161,21 @@
     <div id="print-preview-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
-            <h2></h2>
+            <h2>Aperçu Avant Impression</h2>
             <img id="preview-image" src="" alt="Aperçu du Canevas" style="width: 100%; height: auto;">
             <button id="print-btn">Imprimer</button>
+        </div>
+    </div>
+
+    <!-- Fenêtre Palette de Photos -->
+    <div id="photo-palette-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Palette de Photos</h2>
+            <input type="text" id="photo-search" placeholder="Rechercher des photos..." />
+            <div id="photo-gallery" class="photo-gallery">
+                <!-- Les photos seront chargées ici dynamiquement -->
+            </div>
         </div>
     </div>
 </body>
