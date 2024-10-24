@@ -262,17 +262,15 @@ class PageModule {
             return;
         }
 
-        // Enregistrer l'état de la page actuelle avant de changer, seulement si on change de page
-        if (this.currentPageIndex !== index && this.pages[this.currentPageIndex]) {
-            this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
-        }
+        // Enregistrer l'état de la page actuelle avant de changer
+        this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
 
         // Charger l'état de la nouvelle page
         const newPage = this.pages[index];
-
+    
         // Effacer le canevas actuel
         this.canvas.clear();
-
+    
         // Charger l'état de la nouvelle page si disponible
         if (newPage.canvasState) {
             this.canvas.loadFromJSON(newPage.canvasState, () => {
@@ -283,17 +281,17 @@ class PageModule {
             // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
             this.setupA4Canvas();
         }
-
+    
         // Mettre à jour l'index de la page actuelle
         this.currentPageIndex = index;
-
+    
         // Rendre la liste des pages
         this.renderPageList();
-
+    
         // Enregistrer l'état de la page actuelle après le changement
         this.history.enregistrerEtat();
     }
-
+    
     // Méthode pour renommer une page
     renamePage(index) {
         const currentName = this.pages[index].name;
@@ -389,42 +387,8 @@ class PageModule {
         this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
         this.canvas.renderAll();
     }
-
-    loadFromJSON(jsonData) {
-        try {
-            const pagesData = JSON.parse(jsonData);
-
-            if (!Array.isArray(pagesData)) {
-                throw new Error("Le fichier JSON ne contient pas de données de pages valides.");
-            }
-
-            // Réinitialiser les pages existantes
-            this.pages = [];
-            this.currentPageIndex = 0;
-
-            // Charger chaque page
-            pagesData.forEach((pageData) => {
-                const newPage = {
-                    id: pageData.id,
-                    name: pageData.name,
-                    canvasState: pageData.canvasState
-                };
-                this.pages.push(newPage);
-            });
-
-            // Charger la première page
-            this.switchToPage(0);
-
-            // Rendre la liste des pages
-            this.renderPageList();
-
-        } catch (error) {
-            alert("Erreur lors du chargement du fichier JSON : " + error.message);
-        }
-    }
 }
 
-// La suite du code sera fournie dans la partie 2.
 // Module de Gestion des Formes et Mesures
 class ShapesModule {
     constructor(canvas, colorModule, historyModule) {
@@ -929,6 +893,253 @@ class TextModule {
         });
     }
 }
+
+// Les modules restants (CalculatorModule, ImportExportModule, PrintPreviewModule, DuplicateModule, PhotoPaletteModule, UndoRedoModule, et la classe App) restent inchangés par rapport à la version précédente, sauf pour les ajustements liés au nouveau bouton "Supprimer la Page" que nous avons déjà intégrés.
+
+
+// Classe Principale de l'Application
+class App {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.historyModule = new HistoryModule(canvas);
+        this.colorModule = new ColorModule();
+        this.brushModule = new BrushModule(canvas, this.colorModule, this.historyModule);
+        this.shapesModule = new ShapesModule(canvas, this.colorModule, this.historyModule);
+        this.textModule = new TextModule(canvas, this.historyModule);
+        this.calculatorModule = new CalculatorModule();
+        this.pageModule = new PageModule(canvas, this.historyModule);
+        this.importExportModule = new ImportExportModule(canvas, this.historyModule, this.pageModule);
+        this.printPreviewModule = new PrintPreviewModule(canvas);
+        this.duplicateModule = new DuplicateModule(canvas, this.historyModule);
+        this.photoPaletteModule = new PhotoPaletteModule(canvas, this.historyModule);
+        this.undoRedoModule = new UndoRedoModule(this.historyModule);
+    }
+
+    init() {
+        // Initialiser tous les modules
+        this.colorModule.init();
+        this.brushModule.init();
+        this.shapesModule.init();
+        this.textModule.init();
+        this.calculatorModule.init();
+        this.pageModule.init();
+        this.importExportModule.init();
+        this.printPreviewModule.init();
+        this.duplicateModule.init();
+        this.photoPaletteModule.init();
+        this.undoRedoModule.init();
+
+        // Attacher les événements pour l'annulation et le rétablissement
+        const undoBtn = document.getElementById('annuler-btn');
+        const redoBtn = document.getElementById('rétablir-btn');
+
+        if (undoBtn) {
+            undoBtn.addEventListener('click', () => this.historyModule.annuler());
+        } else {
+            console.warn("Le bouton 'Annuler' avec l'ID 'annuler-btn' est introuvable.");
+        }
+
+        if (redoBtn) {
+            redoBtn.addEventListener('click', () => this.historyModule.retablir());
+        } else {
+            console.warn("Le bouton 'Rétablir' avec l'ID 'rétablir-btn' est introuvable.");
+        }
+
+        // Gestion du bouton "Réinitialiser Vue"
+        const resetViewBtn = document.getElementById('reset-view-btn');
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', () => this.resetView());
+        } else {
+            console.warn("Le bouton 'Réinitialiser Vue' avec l'ID 'reset-view-btn' est introuvable.");
+        }
+
+        // Attacher un nouvel événement pour le bouton "Supprimer l'objet"
+        const deleteObjectBtn = document.getElementById('delete-object');
+        if (deleteObjectBtn) {
+            deleteObjectBtn.addEventListener('click', () => {
+                this.importExportModule.deleteSelectedObject();
+            });
+        } else {
+            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
+        }
+
+        // Enregistrer l'état initial
+        this.historyModule.enregistrerEtat();
+    }
+
+    resetView() {
+        // Réinitialiser le pan et le zoom du canevas
+        this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        this.canvas.setZoom(1);
+        this.canvas.requestRenderAll();
+    }
+}
+
+// Initialisation de l'Application une fois le DOM chargé
+document.addEventListener('DOMContentLoaded', () => {
+    const drawingBoard = document.querySelector('.drawing-board');
+
+    const canvas = new fabric.Canvas('canvas', {
+        isDrawingMode: false,
+        backgroundColor: 'white',
+        allowTouchScrolling: true,
+        width: drawingBoard.clientWidth,
+        height: 297 * 3.779527
+    });
+
+    const historyModule = new HistoryModule(canvas);
+    const pageModule = new PageModule(canvas, historyModule);
+    pageModule.setupA4Canvas();
+
+    window.addEventListener('resize', () => {
+        const newWidth = drawingBoard.clientWidth;
+        canvas.setWidth(newWidth);
+        canvas.renderAll();
+    });
+
+    const app = new App(canvas);
+    app.init();
+});
+// Module de Gestion de la Calculatrice Intégrée// Module de Gestion de la Calculatrice Intégrée
+class CalculatorModule {
+    constructor() {
+        this.calculatorCanvas = document.getElementById('calculator-canvas');
+        this.canvasCalcDisplay = document.getElementById('canvas-calc-display');
+        this.canvasCalcButtons = document.querySelectorAll('#calculator-canvas .calc-btn');
+        this.closeCanvasCalculatorBtn = document.getElementById('close-canvas-calculator');
+    }
+
+    init() {
+        this.setupDrag();
+        this.setupButtons();
+        this.setupVisibility();
+    }
+
+    setupDrag() {
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        const startDrag = (e) => {
+            isDragging = true;
+            const rect = this.calculatorCanvas.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top-70;
+            this.calculatorCanvas.style.cursor = 'move';
+            e.preventDefault();
+        };
+
+        const drag = (e) => {
+            if (isDragging) {
+                let newLeft = e.clientX - offsetX;
+                let newTop = e.clientY - offsetY;
+
+                // Limiter le déplacement à l'écran
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                const calcWidth = this.calculatorCanvas.offsetWidth;
+                const calcHeight = this.calculatorCanvas.offsetHeight;
+
+                newLeft = Math.max(0, Math.min(newLeft, windowWidth - calcWidth));
+                newTop = Math.max(0, Math.min(newTop, windowHeight - calcHeight));
+
+                this.calculatorCanvas.style.left = `${newLeft}px`;
+                this.calculatorCanvas.style.top = `${newTop}px`;
+            }
+        };
+
+        const stopDrag = () => {
+            isDragging = false;
+            this.calculatorCanvas.style.cursor = 'default';
+        };
+
+        const calculatorHeader = this.calculatorCanvas.querySelector('.calculator-header');
+        if (calculatorHeader) {
+            calculatorHeader.addEventListener('mousedown', startDrag);
+        } else {
+            console.warn("Le titre de la calculatrice est introuvable.");
+        }
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', stopDrag);
+    }
+
+    setupButtons() {
+        this.canvasCalcButtons.forEach(button => {
+            button.addEventListener('click', () => this.handleCalcButton(button.textContent));
+        });
+
+        if (this.closeCanvasCalculatorBtn) {
+            this.closeCanvasCalculatorBtn.addEventListener('click', () => this.hideCalculator());
+        } else {
+            console.warn("Le bouton 'Fermer' de la calculatrice est introuvable.");
+        }
+    }
+
+    setupVisibility() {
+        const showCalculatorBtn = document.getElementById('show-calculator');
+        if (showCalculatorBtn) {
+            showCalculatorBtn.addEventListener('click', () => this.showCalculator());
+        } else {
+            console.warn("Le bouton 'Calculatrice' avec l'ID 'show-calculator' est introuvable.");
+        }
+    }
+
+    handleCalcButton(value) {
+        if (value === 'C') {
+            this.canvasCalcDisplay.value = '';
+        } else if (value === '=') {
+            try {
+                this.canvasCalcDisplay.value = eval(this.canvasCalcDisplay.value);
+            } catch {
+                this.canvasCalcDisplay.value = 'Erreur';
+            }
+        } else {
+            this.canvasCalcDisplay.value += value;
+        }
+    }
+
+    showCalculator() {
+        if (this.calculatorCanvas) {
+            this.calculatorCanvas.style.display = 'block';
+            this.calculatorCanvas.style.zIndex = 9999;
+
+            // Obtenir l'élément du canevas
+            const canvasElement = document.getElementById('canvas');
+            if (canvasElement) {
+                // Obtenir les dimensions et la position du canevas
+                const canvasRect = canvasElement.getBoundingClientRect();
+                const canvasLeft = canvasRect.left + window.scrollX;
+                const canvasTop = canvasRect.top + window.scrollY;
+                const canvasWidth = canvasRect.width;
+                const canvasHeight = canvasRect.height;
+
+                // Obtenir les dimensions de la calculatrice
+                const calcWidth = this.calculatorCanvas.offsetWidth;
+                const calcHeight = this.calculatorCanvas.offsetHeight;
+
+                // Calculer la position pour centrer la calculatrice sur le canevas
+                const calcLeft = canvasLeft + (canvasWidth - calcWidth) / 2;
+                const calcTop = canvasTop + (canvasHeight - calcHeight) / 2;
+
+                // Appliquer les positions calculées
+                this.calculatorCanvas.style.left = `${calcLeft}px`;
+                this.calculatorCanvas.style.top = `${calcTop}px`;
+            } else {
+                console.warn("Le canevas avec l'ID 'canvas' est introuvable.");
+            }
+        } else {
+            console.warn("La calculatrice avec l'ID 'calculator-canvas' est introuvable.");
+        }
+    }
+
+    hideCalculator() {
+        if (this.calculatorCanvas) {
+            this.calculatorCanvas.style.display = 'none';
+        }
+    }
+}
+
+
 
 // Module de Gestion de l'Importation et de l'Exportation
 class ImportExportModule {
@@ -1448,169 +1659,6 @@ class TouchGestureModule {
     }
 
     init() {
-        // Écouteur pour touchstart
-        this.canvas.upperCanvasEl.addEventListener('touchstart', this.onTouchStart.bind(this));
-
-        // Écouteur pour touchmove
-        this.canvas.upperCanvasEl.addEventListener('touchmove', this.onTouchMove.bind(this));
-
-        // Écouteur pour touchend
-        this.canvas.upperCanvasEl.addEventListener('touchend', this.onTouchEnd.bind(this));
-    }
-
-    onTouchStart(e) {
-        if (e.touches.length === 2) {
-            this.isPinching = true;
-            this.activeObject = this.canvas.findTarget(e, true);
-
-            if (this.activeObject && (this.activeObject.type === 'image' || this.activeObject.isType('image'))) {
-                const point1 = new fabric.Point(e.touches[0].clientX, e.touches[0].clientY);
-                const point2 = new fabric.Point(e.touches[1].clientX, e.touches[1].clientY);
-                this.lastDistance = fabric.util.distance(point1, point2);
-            } else {
-                this.activeObject = null;
-                this.isPinching = false;
-            }
-        }
-    }
-
-    onTouchMove(e) {
-        if (this.isPinching && e.touches.length === 2 && this.activeObject) {
-            e.preventDefault();
-
-            const point1 = new fabric.Point(e.touches[0].clientX, e.touches[0].clientY);
-            const point2 = new fabric.Point(e.touches[1].clientX, e.touches[1].clientY);
-            const distance = fabric.util.distance(point1, point2);
-
-            // Calculer le facteur d'échelle
-            const scaleFactor = distance / this.lastDistance;
-
-            // Appliquer les limites de mise à l'échelle
-            const newScaleX = this.activeObject.scaleX * scaleFactor;
-            const newScaleY = this.activeObject.scaleY * scaleFactor;
-
-            const minScale = 0.1; // Échelle minimale
-            const maxScale = 10;  // Échelle maximale
-
-            if (newScaleX >= minScale && newScaleX <= maxScale && newScaleY >= minScale && newScaleY <= maxScale) {
-                this.activeObject.scaleX = newScaleX;
-                this.activeObject.scaleY = newScaleY;
-                this.activeObject.setCoords();
-                this.canvas.requestRenderAll();
-                this.lastDistance = distance;
-            }
-        }
-    }
-
-    onTouchEnd(e) {
-        if (this.isPinching) {
-            this.isPinching = false;
-            this.lastDistance = 0;
-            this.activeObject = null;
-            // Enregistrer l'état dans l'historique
-            this.historyModule.enregistrerEtat();
-        }
+        // Les boutons d'annulation et de rétablissement sont déjà gérés dans la classe App
     }
 }
-
-// Classe Principale de l'Application
-class App {
-    constructor(canvas) {
-        this.canvas = canvas;
-        this.historyModule = new HistoryModule(canvas);
-        this.colorModule = new ColorModule();
-        this.brushModule = new BrushModule(canvas, this.colorModule, this.historyModule);
-        this.shapesModule = new ShapesModule(canvas, this.colorModule, this.historyModule);
-        this.textModule = new TextModule(canvas, this.historyModule);
-        this.pageModule = new PageModule(canvas, this.historyModule);
-        this.importExportModule = new ImportExportModule(canvas, this.historyModule, this.pageModule);
-        this.printPreviewModule = new PrintPreviewModule(canvas);
-        this.duplicateModule = new DuplicateModule(canvas, this.historyModule);
-        this.photoPaletteModule = new PhotoPaletteModule(canvas, this.historyModule);
-        this.touchGestureModule = new TouchGestureModule(canvas, this.historyModule);
-    }
-
-    init() {
-        // Initialiser tous les modules
-        this.colorModule.init();
-        this.brushModule.init();
-        this.shapesModule.init();
-        this.textModule.init();
-        this.pageModule.init();
-        this.importExportModule.init();
-        this.printPreviewModule.init();
-        this.duplicateModule.init();
-        this.photoPaletteModule.init();
-        this.touchGestureModule.init();
-
-        // Attacher les événements pour l'annulation et le rétablissement
-        const undoBtn = document.getElementById('annuler-btn');
-        const redoBtn = document.getElementById('rétablir-btn');
-
-        if (undoBtn) {
-            undoBtn.addEventListener('click', () => this.historyModule.annuler());
-        } else {
-            console.warn("Le bouton 'Annuler' avec l'ID 'annuler-btn' est introuvable.");
-        }
-
-        if (redoBtn) {
-            redoBtn.addEventListener('click', () => this.historyModule.retablir());
-        } else {
-            console.warn("Le bouton 'Rétablir' avec l'ID 'rétablir-btn' est introuvable.");
-        }
-
-        // Gestion du bouton "Réinitialiser Vue"
-        const resetViewBtn = document.getElementById('reset-view-btn');
-        if (resetViewBtn) {
-            resetViewBtn.addEventListener('click', () => this.resetView());
-        } else {
-            console.warn("Le bouton 'Réinitialiser Vue' avec l'ID 'reset-view-btn' est introuvable.");
-        }
-
-        // Attacher un nouvel événement pour le bouton "Supprimer l'objet"
-        const deleteObjectBtn = document.getElementById('delete-object');
-        if (deleteObjectBtn) {
-            deleteObjectBtn.addEventListener('click', () => {
-                this.importExportModule.deleteSelectedObject();
-            });
-        } else {
-            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
-        }
-
-        // Enregistrer l'état initial
-        this.historyModule.enregistrerEtat();
-    }
-
-    resetView() {
-        // Réinitialiser le pan et le zoom du canevas
-        this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-        this.canvas.setZoom(1);
-        this.canvas.requestRenderAll();
-    }
-}
-
-// Initialisation de l'Application une fois le DOM chargé
-document.addEventListener('DOMContentLoaded', () => {
-    const drawingBoard = document.querySelector('.drawing-board');
-
-    const canvas = new fabric.Canvas('canvas', {
-        isDrawingMode: false,
-        backgroundColor: 'white',
-        allowTouchScrolling: true,
-        width: drawingBoard.clientWidth,
-        height: 297 * 3.7795275591 // Hauteur A4 en pixels
-    });
-
-    const historyModule = new HistoryModule(canvas);
-    const pageModule = new PageModule(canvas, historyModule);
-    pageModule.setupA4Canvas();
-
-    window.addEventListener('resize', () => {
-        const newWidth = drawingBoard.clientWidth;
-        canvas.setWidth(newWidth);
-        canvas.renderAll();
-    });
-
-    const app = new App(canvas);
-    app.init();
-});
