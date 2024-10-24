@@ -996,7 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = new App(canvas);
     app.init();
 });
-// Module de Gestion de la Calculatrice Intégrée
+// Module de Gestion de la Calculatrice Intégrée// Module de Gestion de la Calculatrice Intégrée
 class CalculatorModule {
     constructor() {
         this.calculatorCanvas = document.getElementById('calculator-canvas');
@@ -1019,7 +1019,7 @@ class CalculatorModule {
             isDragging = true;
             const rect = this.calculatorCanvas.getBoundingClientRect();
             offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
+            offsetY = e.clientY - rect.top-70;
             this.calculatorCanvas.style.cursor = 'move';
             e.preventDefault();
         };
@@ -1098,13 +1098,31 @@ class CalculatorModule {
         if (this.calculatorCanvas) {
             this.calculatorCanvas.style.display = 'block';
             this.calculatorCanvas.style.zIndex = 9999;
-            // Centrer la calculatrice à l'écran
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            const calcWidth = this.calculatorCanvas.offsetWidth;
-            const calcHeight = this.calculatorCanvas.offsetHeight;
-            this.calculatorCanvas.style.left = `${(windowWidth - calcWidth) / 2}px`;
-            this.calculatorCanvas.style.top = `${(windowHeight - calcHeight) / 2}px`;
+
+            // Obtenir l'élément du canevas
+            const canvasElement = document.getElementById('canvas');
+            if (canvasElement) {
+                // Obtenir les dimensions et la position du canevas
+                const canvasRect = canvasElement.getBoundingClientRect();
+                const canvasLeft = canvasRect.left + window.scrollX;
+                const canvasTop = canvasRect.top + window.scrollY;
+                const canvasWidth = canvasRect.width;
+                const canvasHeight = canvasRect.height;
+
+                // Obtenir les dimensions de la calculatrice
+                const calcWidth = this.calculatorCanvas.offsetWidth;
+                const calcHeight = this.calculatorCanvas.offsetHeight;
+
+                // Calculer la position pour centrer la calculatrice sur le canevas
+                const calcLeft = canvasLeft + (canvasWidth - calcWidth) / 2;
+                const calcTop = canvasTop + (canvasHeight - calcHeight) / 2;
+
+                // Appliquer les positions calculées
+                this.calculatorCanvas.style.left = `${calcLeft}px`;
+                this.calculatorCanvas.style.top = `${calcTop}px`;
+            } else {
+                console.warn("Le canevas avec l'ID 'canvas' est introuvable.");
+            }
         } else {
             console.warn("La calculatrice avec l'ID 'calculator-canvas' est introuvable.");
         }
@@ -1116,6 +1134,8 @@ class CalculatorModule {
         }
     }
 }
+
+
 
 // Module de Gestion de l'Importation et de l'Exportation
 class ImportExportModule {
