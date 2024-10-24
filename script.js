@@ -217,6 +217,11 @@ class PageModule {
     }
 
     addPage() {
+        // Enregistrer l'état de la page actuelle avant d'ajouter une nouvelle page
+        if (this.pages[this.currentPageIndex]) {
+            this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
+        }
+
         const newPage = {
             id: this.pages.length + 1,
             name: `Page ${this.pages.length + 1}`,
@@ -251,25 +256,26 @@ class PageModule {
     }
 
     switchToPage(index) {
-        // Vérifiez si l'index est valide
+        // Vérifier si l'index est valide
         if (index < 0 || index >= this.pages.length) {
             alert("Page inexistante.");
             return;
         }
-
-        // Enregistrer l'état de la page actuelle avant de changer
-        this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
-
+    
+        // Enregistrer l'état de la page actuelle avant de changer, seulement si on change de page
+        if (this.currentPageIndex !== index && this.pages[this.currentPageIndex]) {
+            this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
+        }
+    
         // Charger l'état de la nouvelle page
         const newPage = this.pages[index];
-
+    
         // Effacer le canevas actuel
         this.canvas.clear();
-
+    
         // Charger l'état de la nouvelle page si disponible
         if (newPage.canvasState) {
             this.canvas.loadFromJSON(newPage.canvasState, () => {
-                // Appliquer la couleur de fond à chaque changement de page
                 this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
                 this.canvas.renderAll();
             });
@@ -277,17 +283,17 @@ class PageModule {
             // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
             this.setupA4Canvas();
         }
-
+    
         // Mettre à jour l'index de la page actuelle
         this.currentPageIndex = index;
-
+    
         // Rendre la liste des pages
         this.renderPageList();
-
+    
         // Enregistrer l'état de la page actuelle après le changement
         this.history.enregistrerEtat();
     }
-
+    
     // Méthode pour renommer une page
     renamePage(index) {
         const currentName = this.pages[index].name;
@@ -312,18 +318,18 @@ class PageModule {
             alert("Il doit y avoir au moins une page.");
             return;
         }
-    
+
         // Enregistrer l'état de la page actuelle avant de la supprimer
         this.pages[this.currentPageIndex].canvasState = JSON.stringify(this.canvas.toJSON());
-    
+
         // Supprimer la page de la liste des pages
         this.pages.splice(this.currentPageIndex, 1);
-    
+
         // Mettre à jour l'index de la page actuelle
         if (this.currentPageIndex >= this.pages.length) {
             this.currentPageIndex = this.pages.length - 1;
         }
-    
+
         // Renuméroter les pages restantes pour assurer l'unicité et la séquence
         this.pages.forEach((page, index) => {
             page.id = index + 1;
@@ -332,16 +338,16 @@ class PageModule {
                 page.name = `Page ${index + 1}`;
             }
         });
-    
+
         // Rendre la liste des pages
         this.renderPageList();
-    
+
         // Effacer le canevas actuel
         this.canvas.clear();
-    
+
         // Charger l'état de la nouvelle page actuelle
         const newPage = this.pages[this.currentPageIndex];
-    
+
         // Charger l'état de la nouvelle page si disponible
         if (newPage.canvasState) {
             this.canvas.loadFromJSON(newPage.canvasState, () => {
@@ -352,13 +358,13 @@ class PageModule {
             // Si la nouvelle page n'a pas d'état enregistré, configurez le canevas au format A4
             this.setupA4Canvas();
         }
-    
+
         // Enregistrer l'état après suppression
         this.history.enregistrerEtat();
-    
+
         alert("Page supprimée avec succès.");
     }
-     
+
     prevPage() {
         if (this.currentPageIndex > 0) {
             this.switchToPage(this.currentPageIndex - 1);
@@ -376,12 +382,45 @@ class PageModule {
     }
 
     setupA4Canvas() {
-        const width = 280 * 3.7795275591; // Largeur A4 en pixels (210mm)
-        const height = 410 * 3.7795275591; // Hauteur A4 en pixels (297mm)
+        const width = 210 * 3.7795275591; // Largeur A4 en pixels (210mm)
+        const height = 297 * 3.7795275591; // Hauteur A4 en pixels (297mm)
         this.canvas.setWidth(width);
         this.canvas.setHeight(height);
         this.canvas.setBackgroundColor(this.backgroundColor, this.canvas.renderAll.bind(this.canvas));
         this.canvas.renderAll();
+    }
+
+    loadFromJSON(jsonData) {
+        try {
+            const pagesData = JSON.parse(jsonData);
+
+            if (!Array.isArray(pagesData)) {
+                throw new Error("Le fichier JSON ne contient pas de données de pages valides.");
+            }
+
+            // Réinitialiser les pages existantes
+            this.pages = [];
+            this.currentPageIndex = 0;
+
+            // Charger chaque page
+            pagesData.forEach((pageData) => {
+                const newPage = {
+                    id: pageData.id,
+                    name: pageData.name,
+                    canvasState: pageData.canvasState
+                };
+                this.pages.push(newPage);
+            });
+
+            // Charger la première page
+            this.switchToPage(0);
+
+            // Rendre la liste des pages
+            this.renderPageList();
+
+        } catch (error) {
+            alert("Erreur lors du chargement du fichier JSON : " + error.message);
+        }
     }
 }
 
@@ -889,114 +928,7 @@ class TextModule {
         });
     }
 }
-
-// Les modules restants (CalculatorModule, ImportExportModule, PrintPreviewModule, DuplicateModule, PhotoPaletteModule, UndoRedoModule, et la classe App) restent inchangés par rapport à la version précédente, sauf pour les ajustements liés au nouveau bouton "Supprimer la Page" que nous avons déjà intégrés.
-
-
-// Classe Principale de l'Application
-class App {
-    constructor(canvas) {
-        this.canvas = canvas;
-        this.historyModule = new HistoryModule(canvas);
-        this.colorModule = new ColorModule();
-        this.brushModule = new BrushModule(canvas, this.colorModule, this.historyModule);
-        this.shapesModule = new ShapesModule(canvas, this.colorModule, this.historyModule);
-        this.textModule = new TextModule(canvas, this.historyModule);
-        this.calculatorModule = new CalculatorModule();
-        this.pageModule = new PageModule(canvas, this.historyModule);
-        this.importExportModule = new ImportExportModule(canvas, this.historyModule, this.pageModule);
-        this.printPreviewModule = new PrintPreviewModule(canvas);
-        this.duplicateModule = new DuplicateModule(canvas, this.historyModule);
-        this.photoPaletteModule = new PhotoPaletteModule(canvas, this.historyModule);
-        this.undoRedoModule = new UndoRedoModule(this.historyModule);
-    }
-
-    init() {
-        // Initialiser tous les modules
-        this.colorModule.init();
-        this.brushModule.init();
-        this.shapesModule.init();
-        this.textModule.init();
-        this.calculatorModule.init();
-        this.pageModule.init();
-        this.importExportModule.init();
-        this.printPreviewModule.init();
-        this.duplicateModule.init();
-        this.photoPaletteModule.init();
-        this.undoRedoModule.init();
-
-        // Attacher les événements pour l'annulation et le rétablissement
-        const undoBtn = document.getElementById('annuler-btn');
-        const redoBtn = document.getElementById('rétablir-btn');
-
-        if (undoBtn) {
-            undoBtn.addEventListener('click', () => this.historyModule.annuler());
-        } else {
-            console.warn("Le bouton 'Annuler' avec l'ID 'annuler-btn' est introuvable.");
-        }
-
-        if (redoBtn) {
-            redoBtn.addEventListener('click', () => this.historyModule.retablir());
-        } else {
-            console.warn("Le bouton 'Rétablir' avec l'ID 'rétablir-btn' est introuvable.");
-        }
-
-        // Gestion du bouton "Réinitialiser Vue"
-        const resetViewBtn = document.getElementById('reset-view-btn');
-        if (resetViewBtn) {
-            resetViewBtn.addEventListener('click', () => this.resetView());
-        } else {
-            console.warn("Le bouton 'Réinitialiser Vue' avec l'ID 'reset-view-btn' est introuvable.");
-        }
-
-        // Attacher un nouvel événement pour le bouton "Supprimer l'objet"
-        const deleteObjectBtn = document.getElementById('delete-object');
-        if (deleteObjectBtn) {
-            deleteObjectBtn.addEventListener('click', () => {
-                this.importExportModule.deleteSelectedObject();
-            });
-        } else {
-            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
-        }
-
-        // Enregistrer l'état initial
-        this.historyModule.enregistrerEtat();
-    }
-
-    resetView() {
-        // Réinitialiser le pan et le zoom du canevas
-        this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
-        this.canvas.setZoom(1);
-        this.canvas.requestRenderAll();
-    }
-}
-
-// Initialisation de l'Application une fois le DOM chargé
-document.addEventListener('DOMContentLoaded', () => {
-    const drawingBoard = document.querySelector('.drawing-board');
-
-    const canvas = new fabric.Canvas('canvas', {
-        isDrawingMode: false,
-        backgroundColor: 'white',
-        allowTouchScrolling: true,
-        width: drawingBoard.clientWidth,
-        height: 297 * 3.779527
-    });
-
-    const historyModule = new HistoryModule(canvas);
-    const pageModule = new PageModule(canvas, historyModule);
-    pageModule.setupA4Canvas();
-
-    window.addEventListener('resize', () => {
-        const newWidth = drawingBoard.clientWidth;
-        canvas.setWidth(newWidth);
-        canvas.renderAll();
-    });
-
-    const app = new App(canvas);
-    app.init();
-});
-// Module de Gestion de la Calculatrice Intégrée// Module de Gestion de la Calculatrice Intégrée
+// Module de Gestion de la Calculatrice Intégrée
 class CalculatorModule {
     constructor() {
         this.calculatorCanvas = document.getElementById('calculator-canvas');
@@ -1019,7 +951,7 @@ class CalculatorModule {
             isDragging = true;
             const rect = this.calculatorCanvas.getBoundingClientRect();
             offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top-70;
+            offsetY = e.clientY - rect.top;
             this.calculatorCanvas.style.cursor = 'move';
             e.preventDefault();
         };
@@ -1134,8 +1066,6 @@ class CalculatorModule {
         }
     }
 }
-
-
 
 // Module de Gestion de l'Importation et de l'Exportation
 class ImportExportModule {
@@ -1654,3 +1584,107 @@ class UndoRedoModule {
         // Les boutons d'annulation et de rétablissement sont déjà gérés dans la classe App
     }
 }
+
+// Classe Principale de l'Application
+class App {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.historyModule = new HistoryModule(canvas);
+        this.colorModule = new ColorModule();
+        this.brushModule = new BrushModule(canvas, this.colorModule, this.historyModule);
+        this.shapesModule = new ShapesModule(canvas, this.colorModule, this.historyModule);
+        this.textModule = new TextModule(canvas, this.historyModule);
+        this.calculatorModule = new CalculatorModule();
+        this.pageModule = new PageModule(canvas, this.historyModule);
+        this.importExportModule = new ImportExportModule(canvas, this.historyModule, this.pageModule);
+        this.printPreviewModule = new PrintPreviewModule(canvas);
+        this.duplicateModule = new DuplicateModule(canvas, this.historyModule);
+        this.photoPaletteModule = new PhotoPaletteModule(canvas, this.historyModule);
+        this.undoRedoModule = new UndoRedoModule(this.historyModule);
+    }
+
+    init() {
+        // Initialiser tous les modules
+        this.colorModule.init();
+        this.brushModule.init();
+        this.shapesModule.init();
+        this.textModule.init();
+        this.calculatorModule.init();
+        this.pageModule.init();
+        this.importExportModule.init();
+        this.printPreviewModule.init();
+        this.duplicateModule.init();
+        this.photoPaletteModule.init();
+        this.undoRedoModule.init();
+
+        // Attacher les événements pour l'annulation et le rétablissement
+        const undoBtn = document.getElementById('annuler-btn');
+        const redoBtn = document.getElementById('rétablir-btn');
+
+        if (undoBtn) {
+            undoBtn.addEventListener('click', () => this.historyModule.annuler());
+        } else {
+            console.warn("Le bouton 'Annuler' avec l'ID 'annuler-btn' est introuvable.");
+        }
+
+        if (redoBtn) {
+            redoBtn.addEventListener('click', () => this.historyModule.retablir());
+        } else {
+            console.warn("Le bouton 'Rétablir' avec l'ID 'rétablir-btn' est introuvable.");
+        }
+
+        // Gestion du bouton "Réinitialiser Vue"
+        const resetViewBtn = document.getElementById('reset-view-btn');
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', () => this.resetView());
+        } else {
+            console.warn("Le bouton 'Réinitialiser Vue' avec l'ID 'reset-view-btn' est introuvable.");
+        }
+
+        // Attacher un nouvel événement pour le bouton "Supprimer l'objet"
+        const deleteObjectBtn = document.getElementById('delete-object');
+        if (deleteObjectBtn) {
+            deleteObjectBtn.addEventListener('click', () => {
+                this.importExportModule.deleteSelectedObject();
+            });
+        } else {
+            console.warn("Le bouton 'Supprimer l'objet' avec l'ID 'delete-object' est introuvable.");
+        }
+
+        // Enregistrer l'état initial
+        this.historyModule.enregistrerEtat();
+    }
+
+    resetView() {
+        // Réinitialiser le pan et le zoom du canevas
+        this.canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        this.canvas.setZoom(1);
+        this.canvas.requestRenderAll();
+    }
+}
+
+// Initialisation de l'Application une fois le DOM chargé
+document.addEventListener('DOMContentLoaded', () => {
+    const drawingBoard = document.querySelector('.drawing-board');
+
+    const canvas = new fabric.Canvas('canvas', {
+        isDrawingMode: false,
+        backgroundColor: 'white',
+        allowTouchScrolling: true,
+        width: drawingBoard.clientWidth,
+        height: 297 * 3.7795275591 // Hauteur A4 en pixels
+    });
+
+    const historyModule = new HistoryModule(canvas);
+    const pageModule = new PageModule(canvas, historyModule);
+    pageModule.setupA4Canvas();
+
+    window.addEventListener('resize', () => {
+        const newWidth = drawingBoard.clientWidth;
+        canvas.setWidth(newWidth);
+        canvas.renderAll();
+    });
+
+    const app = new App(canvas);
+    app.init();
+});
