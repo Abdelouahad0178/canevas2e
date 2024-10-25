@@ -39,11 +39,14 @@ section {
 
 /* Tableau de bord des outils */
 .tools-board {
+   
     width: 100%;
     padding: 10px 15px 0;
     display: flex;
-    flex-direction: column;
     gap: 15px;
+    flex-direction: column;
+    align-content: space-between;
+    align-items: stretch;
 }
 
 /* Rangée d'options */
@@ -100,6 +103,7 @@ section {
     font-size: 1rem;
     transition: background-color 0.3s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    justify-content: center;
 }
 
 .buttons button:hover,
@@ -118,8 +122,65 @@ section {
     background-color: #3672c7;
 }
 
+.image1{
+
+width: 100%;
 
 
+
+
+}
+
+#fichier{
+display: block;
+justify-content: center;
+
+
+}
+
+
+.page-btn{
+
+
+    padding: 10px;
+    background-color: #4A98F7;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+margin-right: 3px;
+
+
+
+
+}
+
+
+
+
+
+.page-btn:hover{
+
+    background-color: #3672c7;
+
+
+
+}
+
+.active{
+
+
+border: 3px solid rgb(0, 8, 4);
+
+
+
+
+
+}
 
 
 #delete-page-btn{
@@ -501,6 +562,16 @@ font-size: 14px;
     .drawing-board {
         flex: 1;
     }
+    
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
 }
 
 /* Pour les écrans de 992px à 1023px */
@@ -551,6 +622,15 @@ font-size: 14px;
     .drawing-board {
         flex: 1;
     }
+    
+.page-btn{
+
+margin-bottom: 3px;
+
+
+
+
+}
 }
 
 /* Pour les écrans de 720px à 819px */
@@ -592,6 +672,19 @@ font-size: 14px;
         gap: 10px;
         padding: 10px;
     }
+
+    
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
+
+
 }
 
 /* Pour les écrans de 620px à 719px */
@@ -634,6 +727,19 @@ font-size: 14px;
         gap: 8px;
         padding: 8px;
     }
+
+
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
+
+
 }
 
 /* Pour les écrans de 552px à 619px */
@@ -676,6 +782,21 @@ font-size: 14px;
         gap: 6px;
         padding: 6px;
     }
+
+
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
+
+
+
+
 }
 
 /* Pour les écrans de 420px à 551px */
@@ -739,6 +860,19 @@ font-size: 14px;
         padding: 10px;
         font-size: 0.8rem;
     }
+
+
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
+
+
 }
 
 /* Pour les écrans de 360px à 419px */
@@ -800,6 +934,20 @@ font-size: 14px;
         padding: 8px;
         font-size: 0.75rem;
     }
+
+
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
+
+
+
 }
 
 /* Pour les écrans jusqu'à 359px */
@@ -862,4 +1010,17 @@ font-size: 14px;
         padding: 6px;
         font-size: 0.7rem;
     }
+
+
+
+    
+    .page-btn{
+
+        margin-bottom: 3px;
+        
+        
+        
+        
+        }
+
 }
